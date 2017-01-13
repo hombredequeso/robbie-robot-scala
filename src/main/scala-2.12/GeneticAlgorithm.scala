@@ -1,22 +1,13 @@
 package com.hombredequeso.robbierobot
 
-import com.hombredequeso.robbierobot.Evolve.Member
+import com.hombredequeso.robbierobot.Evolve._
 import com.hombredequeso.robbierobot.Strat.Strategy
 
 object GeneticAlgorithm {
 
-  val populationSize = 100
 
-  def createInitialPopulation(): Vector[Strategy] = {
-    (1 to populationSize).map(x =>
-      StrategyFactory.make(
-        StrategyFactory.allScenarios,
-        StrategyFactory.createRandomActions())
-    ).toVector
-  }
-
-  def findOptimalStrategy(iterations: Int): Strategy = {
-    val initialPopulation = createInitialPopulation()
+  def findOptimalStrategy(iterations: Int, populationSize: Int): Strategy = {
+    val initialPopulation = createInitialPopulation(populationSize)
 
     def getStrategyFitness(strategy: Strategy): Int = {
       val boardCount = 100

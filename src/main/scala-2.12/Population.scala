@@ -91,5 +91,15 @@ object Evolve {
     Console.println("Evolving, overall health = " + population.map(x => x.fitness).sum)
     (1 to population.length).map(_ => evolveNewMember(population)).toVector
   }
+
+
+  def createInitialPopulation(populationSize: Int): Vector[Strategy] = {
+    (1 to populationSize).map(x =>
+      StrategyFactory.make(
+        StrategyFactory.allScenarios,
+        StrategyFactory.createRandomActions())
+    ).toVector
+  }
+
 }
 

@@ -7,9 +7,10 @@ class GeneticAlgorithmSpec extends FunSpec with Matchers {
 
   describe("findOptimalStrategy") {
     var iterationCount = 3;
+    val populationSize = 100
 
     it(s"does not blow up in a puff of smoke (iterationCount = ${iterationCount})") {
-      GeneticAlgorithm.findOptimalStrategy(3)
+      GeneticAlgorithm.findOptimalStrategy(iterationCount, populationSize)
     }
   }
 }

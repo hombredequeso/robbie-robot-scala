@@ -93,13 +93,5 @@ object Evolve {
   }
 
 
-  def createInitialPopulation(populationSize: Int): Vector[Strategy] = {
-    (1 to populationSize).map(x =>
-      StrategyFactory.make(
-        StrategyFactory.allScenarios,
-        StrategyFactory.createRandomActions())
-    ).toVector
-  }
-
 }
 

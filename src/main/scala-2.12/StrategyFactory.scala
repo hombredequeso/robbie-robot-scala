@@ -23,4 +23,12 @@ object StrategyFactory {
   def make(scenarios: Set[Scenario], actions: Stream[Action.Value]) : Strategy = {
     scenarios zip actions toMap
   }
+
+  def createInitialPopulation(populationSize: Int): Vector[Strategy] = {
+    (1 to populationSize).map(x =>
+      StrategyFactory.make(
+        StrategyFactory.allScenarios,
+        StrategyFactory.createRandomActions())
+    ).toVector
+  }
 }

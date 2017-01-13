@@ -12,9 +12,11 @@ class GeneticAlgorithmSpec extends FunSpec with Matchers {
     var numberOfTurnsPerBoard = 50;
 
     it(s"does not blow up in a puff of smoke (iterationCount = ${iterationCount})") {
+      val initialPopulation = StrategyFactory.createInitialPopulation(populationSize)
       GeneticAlgorithm.findOptimalStrategy(
         iterationCount, populationSize)(
-        boardCount, numberOfTurnsPerBoard)
+        boardCount, numberOfTurnsPerBoard)(
+        initialPopulation)
     }
   }
 }

@@ -15,7 +15,7 @@ object GeneticAlgorithm {
     ).toVector
   }
 
-  def findOptimalStrategy(): Strategy = {
+  def findOptimalStrategy(iterations: Int): Strategy = {
     val initialPopulation = createInitialPopulation()
 
     def getStrategyFitness(strategy: Strategy): Int = {
@@ -46,7 +46,6 @@ object GeneticAlgorithm {
       }
     }
 
-    val iterations = 10
     val finalResult = goForIt(initialPopulation, iterations)
     val finalResultWithFitness = finalResult.map(s => Member(s, getStrategyFitness(s)))
     val bestStrategy = finalResultWithFitness.sortBy(x => x.fitness).last

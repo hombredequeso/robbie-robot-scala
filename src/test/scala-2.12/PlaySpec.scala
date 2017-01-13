@@ -26,7 +26,8 @@ class PlaySpec extends FunSpec {
 
   describe("execute") {
     describe("with random input data") {
-      it("should return higher than theoretical minimum score") {
+      val numberOfTurns = 4
+      it(s"should return higher than theoretical minimum score (number of turns = ${numberOfTurns})") {
         val strategy = StrategyFactory.make(
           StrategyFactory.allScenarios,
           StrategyFactory.createRandomActions())

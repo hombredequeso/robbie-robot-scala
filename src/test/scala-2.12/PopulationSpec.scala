@@ -15,8 +15,8 @@ class PopulationSpec extends FunSpec with Matchers {
 
     it("with two equally weighted elements returns each about 50% of the time") {
       val x = Vector((0, -1), (0, 1))
-      val result = (0 to 10).map(_ => Evolve.getWeightedRandom(x)).sum
-      val beWithinTolerance = be >= -2 and be <= 2
+      val result = (0 to 100).map(_ => Evolve.getWeightedRandom(x)).sum
+      val beWithinTolerance = be >= -20 and be <= 20
       result should beWithinTolerance
     }
   }
@@ -63,8 +63,9 @@ class PopulationSpec extends FunSpec with Matchers {
   }
 
   describe("evolveNewMember") {
-    it("returns a complete strategy when provided a complete strategy") {
-      val members = (1 to 100).map(_ =>
+    var iterationCount = 100;
+    it(s"returns a complete strategy when provided a complete strategy: iterationCount = ${iterationCount}") {
+      val members = (1 to iterationCount).map(_ =>
         StrategyFactory.make(
           StrategyFactory.allScenarios,
           StrategyFactory.createRandomActions())

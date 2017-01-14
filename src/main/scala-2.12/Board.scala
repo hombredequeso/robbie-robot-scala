@@ -14,8 +14,7 @@ object Board {
     Stream.continually(getWeightedBool(oddsOfTrue))
   }
 
-  type Board = Vector[Vector[Content.Value]]
-
+  type Board = Seq[Seq[Content.Value]]
 
   def createRow(size: Int, hasCanStream: Stream[Boolean])
   : Stream[Content.Value] = {
@@ -24,14 +23,14 @@ object Board {
       .map(hasCan => if (hasCan) Content.Can else Content.Empty)
   }
 
-  def createBoard(probs: Vector[Stream[Boolean]], width: Int)
-  : Vector[Vector[Content.Value]] = {
-    probs.map(r => createRow(width, r).toVector)
+  def createBoard(probs: Seq[Stream[Boolean]], width: Int)
+  : Seq[Seq[Content.Value]] = {
+    probs.map(r => createRow(width, r))
   }
 
   def createRandomBoard(width: Int, height: Int, hasCanProb: Float)
-  : Vector[Vector[Content.Value]] = {
-    val probs = Vector.fill(height)(createRandomBool(hasCanProb))
+  : Seq[Seq[Content.Value]] = {
+    val probs = Seq.fill(height)(createRandomBool(hasCanProb))
     createBoard(probs, width)
   }
 }

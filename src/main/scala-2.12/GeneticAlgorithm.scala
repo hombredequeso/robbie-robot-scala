@@ -1,31 +1,28 @@
 package com.hombredequeso.robbierobot
 
-import com.hombredequeso.robbierobot.Evolve._
-import com.hombredequeso.robbierobot.Strat.Strategy
-
 object GeneticAlgorithm {
 
-  def evolveOverGenerations
-  (generateNextPopulation: => Vector[Strategy] => Vector[Strategy])
+  def evolveOverGenerations[A]
+  (generateNextPopulation: => Vector[A] => Vector[A])
   (generationCount: Int )
-  (population: Vector[Strategy])
-  : Vector[Strategy] = {
+  (population: Vector[A])
+  : Vector[A] = {
     (0 until generationCount).toList
       .foldLeft(population)((p,_) => generateNextPopulation(p))
   }
 
-  def findOptimalStrategy
-  (generateNextPopulation: (Strategy => Int) => Vector[Strategy] => Vector[Strategy])
-  (getFitness: Strategy => Int)
+  def findOptimalStrategy[A]
+  (generateNextPopulation: (A => Int) => Vector[A] => Vector[A])
+  (getFitness: A => Int)
   (generationCount: Int)
-  (initialPopulation: Vector[Strategy])
-  : Strategy = {
-    val getNextPopulation: (Vector[Strategy]) => Vector[Strategy] =
-      generateNextPopulation(getFitness)
+  (initialPopulation: Vector[A])
+  : A = {
+    val getNextPopulation = generateNextPopulation(getFitness)
     val endPopulation = evolveOverGenerations(getNextPopulation)(generationCount)(initialPopulation)
-    val finalResultWithFitness = endPopulation.map(s => Member(s, getFitness(s)))
-    val bestStrategy = finalResultWithFitness.sortBy(x => x.fitness).last
-    bestStrategy.strategy
+    val finalResultWithFitness = endPopulation.map(a => (a, getFitness(a)))
+    val fitness = (x: (A,Int)) => x._2
+    val bestStrategy = finalResultWithFitness.sortBy(fitness).last
+    bestStrategy._1
   }
 }
 

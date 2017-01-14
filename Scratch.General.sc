@@ -13,3 +13,8 @@ identity(2)
 
 // Some(1).fold(Some(3))(_ => _)
 
+
+val v1 = Vector(1,2,3)
+val v2 = Vector(10, 11)
+val v3 = v1.zip(v2)
+

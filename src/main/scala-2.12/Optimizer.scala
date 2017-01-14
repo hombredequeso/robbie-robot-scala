@@ -22,6 +22,7 @@ object Optimizer {
     val finalResultWithFitness = endPopulation.map(a => (a, getFitness(a)))
     val fitness = (x: (A,Int)) => x._2
     val bestStrategy = finalResultWithFitness.sortBy(fitness).last
+    Console.println(s"Final fitness: ${bestStrategy._2}")
     bestStrategy._1
   }
 }

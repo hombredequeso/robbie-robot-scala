@@ -21,35 +21,6 @@ class PopulationSpec extends FunSpec with Matchers {
     }
   }
 
-  describe("totalWeight") {
-   it("with one 0 element returns 1") {
-     val x = Vector((0, "test"))
-     Evolve.getTotalWeight(x) shouldBe 1
-   }
-
-    it("with two 0 element returns 2") {
-      val x = Vector((0, "test"), (0, "test"))
-      Evolve.getTotalWeight(x) shouldBe 2
-    }
-
-    it("with one 10 element returns 1") {
-      val x = Vector((0, "test"), (0, "test"))
-      Evolve.getTotalWeight(x) shouldBe 2
-    }
-
-    it("with n of the same element returns n") {
-      val n = 20
-      val weight = 70
-      val v = (1 to n).map(x => (weight,x)).toVector
-      Evolve.getTotalWeight(v) shouldBe n
-    }
-
-    it("with two elements returns ??") {
-      val x = Vector((0, "test"), (1, "test"))
-      Evolve.getTotalWeight(x) shouldBe 3
-    }
-  }
-
   describe("evolve"){
     it("returns a new population the same size as the original") {
       val strategies = StrategyFactory.make(

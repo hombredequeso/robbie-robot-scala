@@ -1,3 +1,18 @@
+def add(a: Int)(b: Int): Int = a + b
+def doIt(t))
+
+
+def generateNextPopulation
+(getFitness: Float => Int)
+(population: Vector[Float])
+: Vector[Float] = {
+  Vector[Float]()
+}
+
+val a = 0;
+
+
+
 object Content extends Enumeration {
   val Empty, Can, Wall = Value
 }
@@ -32,10 +47,10 @@ def createRandomBoard(width: Int, height: Int, hasCanProb: Float)
   createBoard(probs, width)
 }
 
-val aa = createRandomBoard(10, 10, 0.023f)
+// val aa = createRandomBoard(10, 10, 0.023f)
 
-val canCount = aa
-                .flatten
-                .filter(c => c == Content.Can)
-                .length
+// val canCount = aa
+//                 .flatten
+//                 .filter(c => c == Content.Can)
+//                 .length
 

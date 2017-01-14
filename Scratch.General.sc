@@ -1,3 +1,6 @@
+val l = 1 to 3 toList
+val l2 = 0 until 3 toList
+
 val v = Vector(1,2,3,4)
 v.length
 
@@ -10,5 +13,3 @@ identity(2)
 
 // Some(1).fold(Some(3))(_ => _)
 
-val r = 0 to 99
-r.fo

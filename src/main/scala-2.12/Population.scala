@@ -88,10 +88,18 @@ object Evolve {
   }
 
   def evolve(population: Vector[Member]): Vector[Strategy] = {
-    Console.println("Evolving, overall health = " + population.map(x => x.fitness).sum)
     (1 to population.length).map(_ => evolveNewMember(population)).toVector
   }
 
-
+  def generateNextPopulation
+  (getFitness: Strategy => Int)
+  (population: Vector[Strategy])
+  : Vector[Strategy] = {
+    val members: Vector[Member] =
+      population.map(
+        s => Member(s, getFitness(s)))
+    val newPopulation = Evolve.evolve(members)
+    newPopulation
+  }
 }
 

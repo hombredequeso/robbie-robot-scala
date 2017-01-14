@@ -38,7 +38,6 @@ class PlaySpec extends FunSpec {
         val result = Play.execute(state, strategy, numberOfTurns)
 
         val worstPossibleScore =  numberOfTurns * Play.Scores.HitWall
-        Console.println("End Score = " + result)
         assert(result >= worstPossibleScore)
       }
     }

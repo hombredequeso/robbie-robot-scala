@@ -1,13 +1,13 @@
 package com.hombredequeso.robbierobot
 
-import Strat._
+import Strategy._
 import com.hombredequeso.robbierobot.Action.Action
 
 object Evolve {
 
   import util.Random.nextInt
 
-  case class Member(val strategy: Strategy, val fitness: Int){}
+  case class Member(val strategy: StrategyMap, val fitness: Int){}
 
   def getWeightedValue[T](
          population: Vector[(Int,T)],
@@ -41,12 +41,12 @@ object Evolve {
     result
   }
 
-  def getBreedingMembers(population: Vector[Member]): (Strategy, Strategy) = {
+  def getBreedingMembers(population: Vector[Member]): (StrategyMap, StrategyMap) = {
     val pop2 = population.map(x => (x.fitness, x))
     (getWeightedRandom(pop2).strategy, getWeightedRandom(pop2).strategy)
   }
 
-  def breed(breedingMembers: (Strategy, Strategy)): Strategy = {
+  def breed(breedingMembers: (StrategyMap, StrategyMap)): StrategyMap = {
     val x = breedingMembers._1.toVector.sortBy(x => x._1)
     val size = x.length
     val randomPoint = nextInt(size)
@@ -73,28 +73,28 @@ object Evolve {
     }
   }
 
-  def mutate(strategy: Strategy): Strategy = {
+  def mutate(strategy: StrategyMap): StrategyMap = {
     val percentageToRandomlyMutate = 2
     val countToMutate = strategy.size * percentageToRandomlyMutate
     val result = mutateR(strategy.toVector, countToMutate)
     result.toMap
   }
 
-  def evolveNewMember(population: Vector[Member]) : Strategy = {
+  def evolveNewMember(population: Vector[Member]) : StrategyMap = {
     val breedingMembers = getBreedingMembers(population)
     val newMember1 = breed(breedingMembers)
     val newMember2 = mutate(newMember1)
     newMember2
   }
 
-  def evolve(population: Vector[Member]): Vector[Strategy] = {
+  def evolve(population: Vector[Member]): Vector[StrategyMap] = {
     (1 to population.length).map(_ => evolveNewMember(population)).toVector
   }
 
   def generateNextPopulation
-  (getFitness: Strategy => Int)
-  (population: Vector[Strategy])
-  : Vector[Strategy] = {
+  (getFitness: StrategyMap => Int)
+  (population: Vector[StrategyMap])
+  : Vector[StrategyMap] = {
     val members: Vector[Member] =
       population.map(
         s => Member(s, getFitness(s)))

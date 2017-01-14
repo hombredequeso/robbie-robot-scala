@@ -1,7 +1,7 @@
 package com.hombredequeso.robbierobot
 
 import com.hombredequeso.robbierobot.Board.Board
-import com.hombredequeso.robbierobot.Strat.Strategy
+import com.hombredequeso.robbierobot.Strategy._
 
 object Play {
 
@@ -23,7 +23,7 @@ object Play {
 
   val initialRobotPosition = Coord(0,0)
 
-  def execute(state: State, strategy: Strategy, turns: Int): Int = {
+  def execute(state: State, strategy: StrategyMap, turns: Int): Int = {
     val doTurn = executeTurn(strategy)(_)
     val endResult = (1 to turns).foldLeft((state, 0))((current,_) => {
       val next = doTurn(current._1)
@@ -33,7 +33,7 @@ object Play {
   }
 
   // returns (newState, turnScore
-  def executeTurn(strategy: Strategy)(state: State) : (State, Int) = {
+  def executeTurn(strategy: StrategyMap)(state: State) : (State, Int) = {
     val scenario: Scenario = getScenario(state)
     val move: Action.Value = strategy(scenario)
     val moveResult: (State, Int) = executeAction(state, move)

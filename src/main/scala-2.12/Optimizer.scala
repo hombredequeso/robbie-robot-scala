@@ -1,6 +1,6 @@
-package com.hombredequeso.robbierobot
+package com.hombredequeso.geneticAlgorithm
 
-object GeneticAlgorithm {
+object Optimizer {
 
   def evolveOverGenerations[A]
   (generateNextPopulation: => Vector[A] => Vector[A])

@@ -1,5 +1,6 @@
 package com.hombredequeso.robbierobot
 
+import com.hombredequeso.geneticAlgorithm.Optimizer
 import org.scalatest.{FunSpec, Matchers}
 
 class GeneticAlgorithmSpec extends FunSpec with Matchers {
@@ -13,8 +14,9 @@ class GeneticAlgorithmSpec extends FunSpec with Matchers {
 
     it(s"can execute ${iterationCount} generations") {
       val initialPopulation = StrategyFactory.createInitialPopulation(populationSize)
-      val getFitness = Strat.getStrategyFitness(boardCount, numberOfTurnsPerBoard)_
-      GeneticAlgorithm.findOptimalStrategy(Evolve.generateNextPopulation)(getFitness)(iterationCount)(initialPopulation)
+      val getFitness = Strategy.getStrategyFitness(boardCount, numberOfTurnsPerBoard)_
+      Optimizer.findOptimalStrategy(Evolve.generateNextPopulation)(getFitness)(iterationCount)(initialPopulation)
     }
   }
 }
+

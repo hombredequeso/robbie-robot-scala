@@ -43,6 +43,7 @@ object GeneticAlgorithm {
     }
   }
 
+  // TODO: next generalize algorithm by drawing out breedNextGeneration function.
   def findOptimalStrategy
   // (breedNextGeneration: Vector[Strategy] => Vector[Strategy])
   (getFitness: Strategy => Int)

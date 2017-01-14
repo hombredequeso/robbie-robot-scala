@@ -7,7 +7,7 @@ class GeneticAlgorithmSpec extends FunSpec with Matchers {
 
   describe("findOptimalStrategy") {
 
-    val iterationCount = 3;
+    val iterationCount = 20;
     val populationSize = 100;
     val boardCount = 10;
     val numberOfTurnsPerBoard = 50;

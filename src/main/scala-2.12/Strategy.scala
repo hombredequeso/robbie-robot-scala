@@ -35,7 +35,7 @@ object Strategy {
   (boardCount: Int, numberOfTurnsPerBoard: Int)
   (strategy: StrategyMap)
   : Int = {
-    val boards = (1 to boardCount).map(x => Board.createRandomBoard(100, 100, 0.5f))
+    val boards = (1 to boardCount).par.map(x => Board.createRandomBoard(100, 100, 0.5f))
     val fitness = boards.map(b =>
       Play.execute(
         Play.State(b, Play.initialRobotPosition),

@@ -2,11 +2,12 @@ package com.hombredequeso.robbierobot
 
 object Board {
 
-  import util.Random.nextInt
+  import scala.util.Random
 
   def createRandomBool(oddsOfTrue: Float): Stream[Boolean] = {
+    val r = new Random()
     def getWeightedBool(oddsOfTrue: Float): Boolean = {
-      val randomInt = (nextInt(100)) / 100f
+      val randomInt = (r.nextInt(100)) / 100f
       randomInt < oddsOfTrue
     }
 

@@ -1,8 +1,10 @@
 package com.hombredequeso.robbierobot
 
 
-import com.hombredequeso.robbierobot.Play.State
+import com.hombredequeso.robbierobot.Play.{State, PlayStrategy}
 import org.scalatest.FunSpec
+
+import scala.util._
 
 
 
@@ -17,7 +19,7 @@ class PlaySpec extends FunSpec {
         val board = Board.createRandomBoard(100, 100, 0.5f)
         val state = State(board, Play.initialRobotPosition)
 
-        val result = Play.executeTurn(strategy)(state)
+        val result = Play.executeTurn(PlayStrategy(strategy, new Random()))(state)
 
         assert(result._2 >= Play.Scores.HitWall)
       }

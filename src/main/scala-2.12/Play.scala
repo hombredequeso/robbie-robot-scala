@@ -12,7 +12,7 @@ object Play {
 
   import RelativePosition._
   import Action._
-  import util.Random.nextInt
+  import scala.util.Random
 
   case class Coord(val x: Int, val y: Int){
     def + (c: Coord): Coord = {
@@ -23,8 +23,11 @@ object Play {
 
   val initialRobotPosition = Coord(0,0)
 
+  case class PlayStrategy(val map: StrategyMap, val random: Random){}
+
   def execute(state: State, strategy: StrategyMap, turns: Int): Int = {
-    val doTurn = executeTurn(strategy)(_)
+    val r = new Random()
+    val doTurn = executeTurn(PlayStrategy(strategy, r))_
     val endResult = (1 to turns).foldLeft((state, 0))((current,_) => {
       val next = doTurn(current._1)
       (next._1, next._2 + current._2)
@@ -33,10 +36,10 @@ object Play {
   }
 
   // returns (newState, turnScore
-  def executeTurn(strategy: StrategyMap)(state: State) : (State, Int) = {
+  def executeTurn(strategy: PlayStrategy)(state: State) : (State, Int) = {
     val scenario: Scenario = getScenario(state)
-    val move: Action.Value = strategy(scenario)
-    val moveResult: (State, Int) = executeAction(state, move)
+    val move: Action.Value = strategy.map(scenario)
+    val moveResult: (State, Int) = executeAction(strategy.random)(state, move)
     moveResult
   }
 
@@ -88,8 +91,8 @@ object Play {
     content == Content.Wall
   }
 
-  def getRandomMove() = {
-    val x = nextInt(4)
+  def getRandomMove(r: Random) = {
+    val x = r.nextInt(4)
     x match {
       case 0 => North
       case 1 => South
@@ -98,7 +101,7 @@ object Play {
     }
   }
 
-  def executeAction(state: State, action: Action.Value): (State, Int) = {
+  def executeAction(random: Random)(state: State, action: Action.Value): (State, Int) = {
     action match {
       case MoveNorth =>
         executeMove(state, scenarioOffsets(North))
@@ -109,7 +112,7 @@ object Play {
       case MoveWest =>
         executeMove(state, scenarioOffsets(West))
       case MoveRandom => {
-        executeMove(state, scenarioOffsets(getRandomMove))
+        executeMove(state, scenarioOffsets(getRandomMove(random)))
       }
       case Nothing =>
         (state, Scores.None)

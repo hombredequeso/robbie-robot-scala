@@ -3,8 +3,7 @@ package com.hombredequeso.robbierobot
 import com.hombredequeso.robbierobot.Evolve._
 import com.hombredequeso.robbierobot.Strat.Strategy
 
-object GeneticAlgorithm {
-
+object StrategyAlgorithm {
   def getStrategyFitness
   (boardCount: Int, numberOfTurnsPerBoard: Int)
   (strategy: Strategy)
@@ -17,43 +16,46 @@ object GeneticAlgorithm {
         numberOfTurnsPerBoard))
     fitness.sum
   }
+}
+
+object GeneticAlgorithm {
 
   def generateNextPopulation
-  (boardCount: Int, numberOfTurnsPerBoard: Int)
+  (getFitness: Strategy => Int)
   (population: Vector[Strategy])
   : Vector[Strategy] = {
     val members: Vector[Member] =
       population.map(
-        s => Member(s, getStrategyFitness(boardCount, numberOfTurnsPerBoard)(s)))
+        s => Member(s, getFitness(s)))
     val newPopulation = Evolve.evolve(members)
     newPopulation
   }
 
   def evolveOverGenerations
+  (getFitness: Strategy => Int)
   (population: Vector[Strategy], generationCount: Int )
-  (boardCount: Int, numberOfTurnsPerBoard: Int)
   : Vector[Strategy] = {
     if (generationCount == 0)
       population
     else {
-      val newStrategies = generateNextPopulation(
-        boardCount, numberOfTurnsPerBoard)(
-        population)
-      evolveOverGenerations(newStrategies, generationCount - 1)(boardCount, numberOfTurnsPerBoard)
+      val newStrategies = generateNextPopulation(getFitness)(population)
+      evolveOverGenerations(getFitness)(newStrategies, generationCount - 1)
     }
   }
 
   def findOptimalStrategy
+  // (breedNextGeneration: Vector[Strategy] => Vector[Strategy])
+  (getFitness: Strategy => Int)
   (generationCount: Int, populationSize: Int)
   (boardCount: Int, numberOfTurnsPerBoard: Int)
   (initialPopulation: Vector[Strategy])
   : Strategy = {
 
     val finalResult: Vector[Strategy] =
-      evolveOverGenerations(initialPopulation, generationCount)(boardCount, numberOfTurnsPerBoard)
+      evolveOverGenerations(getFitness)(initialPopulation, generationCount)
     val finalResultWithFitness =
       finalResult
-        .map(s => Member(s, getStrategyFitness(boardCount, numberOfTurnsPerBoard)(s)))
+        .map(s => Member(s, getFitness(s)))
     val bestStrategy = finalResultWithFitness.sortBy(x => x.fitness).last
     bestStrategy.strategy
   }

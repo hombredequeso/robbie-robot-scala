@@ -13,7 +13,10 @@ class GeneticAlgorithmSpec extends FunSpec with Matchers {
 
     it(s"does not blow up in a puff of smoke (iterationCount = ${iterationCount})") {
       val initialPopulation = StrategyFactory.createInitialPopulation(populationSize)
+      val getFitness = StrategyAlgorithm.getStrategyFitness(boardCount, numberOfTurnsPerBoard)_
+
       GeneticAlgorithm.findOptimalStrategy(
+        getFitness)(
         iterationCount, populationSize)(
         boardCount, numberOfTurnsPerBoard)(
         initialPopulation)

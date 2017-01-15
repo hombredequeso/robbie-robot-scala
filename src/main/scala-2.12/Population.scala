@@ -3,44 +3,26 @@ package com.hombredequeso.robbierobot
 import Strategy._
 import com.hombredequeso.robbierobot.Action.Action
 import scala.util._
+import scala.math._
 
 object Evolve {
 
+  case class Member[A](val strategy: A, val fitness: Int){}
 
-  case class Member(val strategy: StrategyMap, val fitness: Int){}
-
-  def getWeightedValue[T](
-         population: Vector[(Int,T)],
-         accumulatedWeight: Int,
-         targetWeight: Int,
-         baseWeight: Int): T = {
-    val newAccumulatedWeight = accumulatedWeight + (population.head._1 - baseWeight + 1)
-    if (newAccumulatedWeight >= targetWeight || population.length == 1)
-      population.head._2
-    else
-      getWeightedValue(
-        population.tail,
-        newAccumulatedWeight,
-        targetWeight,
-        baseWeight)
+  def getBreedingMember[A](r: Random)(membersToRandomlyPick: Int)(population: Vector[Member[A]]): Member[A] = {
+    val populationSize = population.length
+    Seq.fill(membersToRandomlyPick)(population(r.nextInt(populationSize)))
+      .maxBy(x => x.fitness)
   }
 
-
-  def getWeightedRandom[T](population: Vector[(Int, T)]): T = {
-    // todo: what if no elements in vector?
-    val baseWeight = population.map(_._1).min
-    val totalWeight = population.map(x => (x._1 - baseWeight + 1)).sum
-    val targetWeight = new Random().nextInt(totalWeight)+1
-    getWeightedValue(population, 0, targetWeight, baseWeight)
+  def getBreedingMembers[A](r: Random)(population: Vector[Member[A]]): (A, A) = {
+    val membersToRandomlyPick = 15;
+    val result1 = getBreedingMember(r)(membersToRandomlyPick)(population)
+    val result2 = getBreedingMember(r)(membersToRandomlyPick)(population)
+    (result1.strategy, result2.strategy)
   }
 
-  def getBreedingMembers(population: Vector[Member]): (StrategyMap, StrategyMap) = {
-    // remap weightings:
-    val pop2: Vector[(Int, Member)] = population.map(x => (x.fitness, x))
-    (getWeightedRandom(pop2).strategy, getWeightedRandom(pop2).strategy)
-  }
-
-  def breed(breedingMembers: (StrategyMap, StrategyMap)): StrategyMap = {
+  def breed[A,B](breedingMembers: (Map[A,B], Map[A,B]))(implicit ordering:Ordering[A]): Map[A,B] = {
     val x = breedingMembers._1.toVector.sortBy(x => x._1)
     val size = x.length
     val randomPoint = new Random().nextInt(size)
@@ -58,10 +40,10 @@ object Evolve {
     mutateCount match {
       case x if x <= 0 => strategy
       case _ => {
-        val itemPosTomutate = r.nextInt(strategy.size)
-        val itemToMutate = strategy(itemPosTomutate)
+        val itemPosToMutate = r.nextInt(strategy.size)
+        val itemToMutate = strategy(itemPosToMutate)
         val randomAction = Action(r.nextInt(Action.maxId))
-        val newOne = strategy.patch(itemPosTomutate, Vector((itemToMutate._1, randomAction)), 1)
+        val newOne = strategy.patch(itemPosToMutate, Vector((itemToMutate._1, randomAction)), 1)
         mutateR(r)(newOne, mutateCount - 1)
       }
     }
@@ -69,20 +51,21 @@ object Evolve {
 
   def mutate(strategy: StrategyMap): StrategyMap = {
     val r = new Random()
-    val percentageToRandomlyMutate = 5
-    val countToMutate = strategy.size * percentageToRandomlyMutate
-    val result = mutateR(r)(strategy.toVector, countToMutate)
+    val ratioToMutate = 0.2
+    val countToMutate = (strategy.size.toDouble * ratioToMutate).toInt
+    val actualCountToMutate = r.nextInt(countToMutate + 1)
+    val result = mutateR(r)(strategy.toVector, actualCountToMutate)
     result.toMap
   }
 
-  def evolveNewMember(population: Vector[Member]) : StrategyMap = {
-    val breedingMembers = getBreedingMembers(population)
+  def evolveNewMember(population: Vector[Member[StrategyMap]]) : StrategyMap = {
+    val breedingMembers = getBreedingMembers(new Random())(population)
     val newMember1 = breed(breedingMembers)
     val newMember2 = mutate(newMember1)
     newMember2
   }
 
-  def evolve(population: Vector[Member]): Vector[StrategyMap] = {
+  def evolve(population: Vector[Member[StrategyMap]]): Vector[StrategyMap] = {
     val totalWeight = population.map(x => (x.fitness)).sum
     val minWeight = population.map(x => (x.fitness)).min
     val maxWeight = population.map(x => (x.fitness)).max
@@ -90,11 +73,12 @@ object Evolve {
 
     (1 to population.length).par.map(_ => evolveNewMember(population)).toVector
   }
+
   def generateNextPopulation
   (getFitness: StrategyMap => Int)
   (population: Vector[StrategyMap])
   : Vector[StrategyMap] = {
-    val members: Vector[Member] =
+    val members: Vector[Member[StrategyMap]] =
       population.map(
         s => Member(s, getFitness(s)))
     val newPopulation = Evolve.evolve(members)

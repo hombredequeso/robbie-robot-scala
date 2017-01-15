@@ -41,7 +41,7 @@ object Strategy {
         Play.State(b, Play.initialRobotPosition),
         strategy,
         numberOfTurnsPerBoard))
-    fitness.sum
+    fitness.sum / boardCount
   }
 }
 

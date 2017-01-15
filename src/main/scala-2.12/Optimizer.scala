@@ -7,8 +7,7 @@ object Optimizer {
   (generationCount: Int )
   (population: Vector[A])
   : Vector[A] = {
-    (0 until generationCount).toList
-      .foldLeft(population)((p,_) => generateNextPopulation(p))
+    (0 until generationCount).foldLeft(population)((p,_) => generateNextPopulation(p))
   }
 
   def findOptimalStrategy[A]

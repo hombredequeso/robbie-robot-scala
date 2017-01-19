@@ -21,7 +21,7 @@ object Play {
   }
   case class State(val board: Board, val robotPos: Coord){}
 
-  val initialRobotPosition = Coord(0,0)
+  val initialRobotPosition = Coord(4,4)
 
   case class PlayStrategy(val map: StrategyMap, val random: Random){}
 

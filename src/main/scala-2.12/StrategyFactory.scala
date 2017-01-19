@@ -1,6 +1,7 @@
 package com.hombredequeso.robbierobot
 
 import Strategy._
+import com.hombredequeso.robbierobot.Action.Action
 
 object StrategyFactory {
 
@@ -28,5 +29,10 @@ object StrategyFactory {
         StrategyFactory.allScenarios,
         StrategyFactory.createRandomActions())
     ).toVector
+  }
+
+  def initStrategy(action: Action): StrategyMap = {
+    val r = allScenarios.toList.map(s => (s -> action)).toMap
+    r
   }
 }

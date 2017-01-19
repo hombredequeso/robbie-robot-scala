@@ -16,7 +16,7 @@ class PlaySpec extends FunSpec {
         val strategy = StrategyFactory.make(
           StrategyFactory.allScenarios,
           StrategyFactory.createRandomActions())
-        val board = Board.createRandomBoard(100, 100, 0.5f)
+        val board = Board.createRandomBoard(10, 10, 0.5f)
         val state = State(board, Play.initialRobotPosition)
 
         val result = Play.executeTurn(PlayStrategy(strategy, new Random()))(state)
@@ -33,7 +33,7 @@ class PlaySpec extends FunSpec {
         val strategy = StrategyFactory.make(
           StrategyFactory.allScenarios,
           StrategyFactory.createRandomActions())
-        val board = Board.createRandomBoard(100, 100, 0.5f)
+        val board = Board.createRandomBoard(10, 10, 0.5f)
         val state = State(board, Play.initialRobotPosition)
 
         val numberOfTurns = 100

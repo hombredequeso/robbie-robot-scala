@@ -16,7 +16,8 @@ object Evolve {
   }
 
   def getBreedingMembers[A](r: Random)(population: Vector[Member[A]]): (A, A) = {
-    val membersToRandomlyPick = 15;
+    val ratioOfMembersToRandomlyPick = 0.1
+    val membersToRandomlyPick = Math.ceil(population.length * ratioOfMembersToRandomlyPick).toInt;
     val result1 = getBreedingMember(r)(membersToRandomlyPick)(population)
     val result2 = getBreedingMember(r)(membersToRandomlyPick)(population)
     (result1.strategy, result2.strategy)
@@ -51,7 +52,7 @@ object Evolve {
 
   def mutate(strategy: StrategyMap): StrategyMap = {
     val r = new Random()
-    val ratioToMutate = 0.2
+    val ratioToMutate = 0.1
     val countToMutate = (strategy.size.toDouble * ratioToMutate).toInt
     val actualCountToMutate = r.nextInt(countToMutate + 1)
     val result = mutateR(r)(strategy.toVector, actualCountToMutate)
@@ -65,11 +66,14 @@ object Evolve {
     newMember2
   }
 
+  var iteration = 0
+
   def evolve(population: Vector[Member[StrategyMap]]): Vector[StrategyMap] = {
     val totalWeight = population.map(x => (x.fitness)).sum
     val minWeight = population.map(x => (x.fitness)).min
     val maxWeight = population.map(x => (x.fitness)).max
-    Console.println(s"max = ${maxWeight}; min = ${minWeight}; totalWeight = ${totalWeight}")
+    Console.println(s"it = ${iteration}: max = ${maxWeight}; min = ${minWeight}; totalWeight = ${totalWeight}")
+    iteration = iteration + 1
 
     (1 to population.length).par.map(_ => evolveNewMember(population)).toVector
   }

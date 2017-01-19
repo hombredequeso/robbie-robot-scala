@@ -2,6 +2,8 @@ package com.hombredequeso.robbierobot
 
 import Content._
 import Action._
+import com.hombredequeso.robbierobot.Play.Scores
+
 import scala.math.pow
 
 object Strategy {
@@ -35,13 +37,19 @@ object Strategy {
   (boardCount: Int, numberOfTurnsPerBoard: Int)
   (strategy: StrategyMap)
   : Int = {
-    val boards = (1 to boardCount).par.map(x => Board.createRandomBoard(100, 100, 0.5f))
+    val boards = (1 to boardCount).par.map(x => Board.createRandomBoard(10, 10, 0.5f))
     val fitness = boards.map(b =>
       Play.execute(
         Play.State(b, Play.initialRobotPosition),
         strategy,
         numberOfTurnsPerBoard))
-    fitness.sum / boardCount
+
+    /*
+    val maxLikelyTotalPerGame = numberOfTurnsPerBoard * Scores.PickedUpCan / 2
+    val f = 100.0 * fitness.sum / boardCount / maxLikelyTotalPerGame
+    f.toInt
+    */
+    fitness.sum
   }
 }
 

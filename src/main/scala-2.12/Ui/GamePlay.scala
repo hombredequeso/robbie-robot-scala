@@ -1,4 +1,4 @@
-package Ui
+package com.hombredequeso.robbierobot.Ui
 
 import scala.util.Random
 import com.hombredequeso.robbierobot.{Board, Play}

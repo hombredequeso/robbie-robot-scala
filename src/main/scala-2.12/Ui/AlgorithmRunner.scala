@@ -1,4 +1,4 @@
-package Ui
+package com.hombredequeso.robbierobot.Ui
 
 import com.hombredequeso.geneticAlgorithm.Optimizer
 import com.hombredequeso.robbierobot.Strategy.StrategyMap

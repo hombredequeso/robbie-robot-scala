@@ -1,10 +1,10 @@
-package Ui
+package com.hombredequeso.robbierobot.Ui
 
 import scalafx.beans.property.DoubleProperty
 import javafx.beans.property.SimpleBooleanProperty
 
-import com.hombredequeso.robbierobot._
-import hello.PlayParameters._
+import com.hombredequeso.robbierobot.{Content, Play}
+import com.hombredequeso.robbierobot.main.PlayParameters._
 
 object Vm {
 

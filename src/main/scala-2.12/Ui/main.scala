@@ -1,6 +1,6 @@
-package hello
+package com.hombredequeso.robbierobot.main
 
-import Ui.{GamePlay, View}
+import com.hombredequeso.robbierobot.Ui.{AlgorithmRunner, GamePlay, View, Vm}
 import com.hombredequeso.robbierobot.Play
 import com.hombredequeso.robbierobot.Strategy.StrategyMap
 
@@ -25,11 +25,13 @@ object HelloSBT extends JFXApp {
   implicit val ec = ExecutionContext.global
   var strategy: Option[StrategyMap] = None
   var gotStrategy = Future[Boolean] {
-    val bestStrategy = Ui.AlgorithmRunner.execute()
+    val bestStrategy = AlgorithmRunner.execute()
     strategy = Some(bestStrategy)
     true
   }
-  GamePlay.InitializeGameState(PlayParameters.xSquareCount,
+
+  GamePlay.InitializeGameState(
+    PlayParameters.xSquareCount,
     PlayParameters.ySquareCount,
     Play.initialRobotPosition
   )
@@ -37,13 +39,13 @@ object HelloSBT extends JFXApp {
   stage = new PrimaryStage {
     title = "Robbie the Rubbish Robot"
     scene = new Scene(xWindowWidth,yWindowHeight) {
-      content = View.getContent(Ui.Vm.viewModel, xWindowWidth,yWindowHeight)
+      content = View.getContent(Vm.viewModel, xWindowWidth,yWindowHeight)
 
       val timer = AnimationTimer((t:Long) => {
         if (((t - lastTime) > rate)&& strategy.isDefined) {
           lastTime = t
           GamePlay.executeTurn(strategy.get)
-          Ui.Vm.updateViewModel(GamePlay.gameState, Ui.Vm.viewModel)
+          Vm.updateViewModel(GamePlay.gameState, Vm.viewModel)
         }
       })
       timer.start

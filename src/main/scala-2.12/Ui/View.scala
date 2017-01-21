@@ -1,4 +1,4 @@
-package Ui
+package com.hombredequeso.robbierobot.Ui
 
 import javafx.beans.property.SimpleBooleanProperty
 

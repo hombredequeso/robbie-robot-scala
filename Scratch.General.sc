@@ -1,3 +1,5 @@
+(0 to 3).toList
+
 
 val ma = (0 to 9).map(x => (x, x)).toMap
 val mb = (0 to 9).map(x => (x, x + 10)).toMap

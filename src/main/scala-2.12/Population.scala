@@ -2,6 +2,9 @@ package com.hombredequeso.robbierobot
 
 import Strategy._
 import com.hombredequeso.robbierobot.Action.Action
+import com.hombredequeso.util.RND.ScalaRandomizer
+import com.hombredequeso.util.RandomProvider
+
 import scala.util._
 import scala.math._
 
@@ -9,13 +12,13 @@ object Evolve {
 
   case class Member[A](val strategy: A, val fitness: Int){}
 
-  def getBreedingMember[A](r: Random)(membersToRandomlyPick: Int)(population: Vector[Member[A]]): Member[A] = {
+  def getBreedingMember[A](r: RandomProvider)(membersToRandomlyPick: Int)(population: Vector[Member[A]]): Member[A] = {
     val populationSize = population.length
     Seq.fill(membersToRandomlyPick)(population(r.nextInt(populationSize)))
       .maxBy(x => x.fitness)
   }
 
-  def getBreedingMembers[A](r: Random)(population: Vector[Member[A]]): (A, A) = {
+  def getBreedingMembers[A](r: RandomProvider)(population: Vector[Member[A]]): (A, A) = {
     val ratioOfMembersToRandomlyPick = 0.1
     val membersToRandomlyPick = Math.ceil(population.length * ratioOfMembersToRandomlyPick).toInt;
     val result1 = getBreedingMember(r)(membersToRandomlyPick)(population)
@@ -26,7 +29,7 @@ object Evolve {
   def breed[A,B](breedingMembers: (Map[A,B], Map[A,B]))(implicit ordering:Ordering[A]): Map[A,B] = {
     val x = breedingMembers._1.toVector.sortBy(x => x._1)
     val size = x.length
-    val randomPoint = new Random().nextInt(size)
+    val randomPoint = new ScalaRandomizer().nextInt(size)
     val part1 = x.slice(0, randomPoint)
     val y = breedingMembers._2.toVector.sortBy(x => x._1)
     val part2 = y.slice(randomPoint, y.length + 1)
@@ -37,7 +40,7 @@ object Evolve {
 
   type VectorizedStrategy = Vector[(Scenario, Action)]
 
-  def mutateR(r: Random)(strategy: VectorizedStrategy, mutateCount: Int): VectorizedStrategy = {
+  def mutateR(r: RandomProvider)(strategy: VectorizedStrategy, mutateCount: Int): VectorizedStrategy = {
     mutateCount match {
       case x if x <= 0 => strategy
       case _ => {
@@ -51,7 +54,7 @@ object Evolve {
   }
 
   def mutate(strategy: StrategyMap): StrategyMap = {
-    val r = new Random()
+    val r = new ScalaRandomizer()
     val ratioToMutate = 0.1
     val countToMutate = (strategy.size.toDouble * ratioToMutate).toInt
     val actualCountToMutate = r.nextInt(countToMutate + 1)
@@ -60,7 +63,7 @@ object Evolve {
   }
 
   def evolveNewMember(population: Vector[Member[StrategyMap]]) : StrategyMap = {
-    val breedingMembers = getBreedingMembers(new Random())(population)
+    val breedingMembers = getBreedingMembers(new ScalaRandomizer())(population)
     val newMember1 = breed(breedingMembers)
     val newMember2 = mutate(newMember1)
     newMember2

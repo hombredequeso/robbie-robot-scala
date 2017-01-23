@@ -1,9 +1,9 @@
 package com.hombredequeso.robbierobot.Ui
 
-import scala.util.Random
 import com.hombredequeso.robbierobot.{Board, Play}
 import com.hombredequeso.robbierobot.Play.{Coord, PlayStrategy, State}
 import com.hombredequeso.robbierobot.Strategy.StrategyMap
+import com.hombredequeso.util.RND.ScalaRandomizer
 
 object GamePlay {
 
@@ -17,7 +17,7 @@ object GamePlay {
     Board.createRandomBoard(0, 0, 0.5f).map(x => x.toList).toList,
     Coord(0,0)
   )
-  val r = new Random()
+  val r = new ScalaRandomizer()
 
   def executeTurn(strategy: StrategyMap) = {
     val startState = gameState

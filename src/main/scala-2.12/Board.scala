@@ -1,18 +1,8 @@
 package com.hombredequeso.robbierobot
 
+import com.hombredequeso.util.RND.ScalaRandomizer
+
 object Board {
-
-  import scala.util.Random
-
-  def createRandomBool(oddsOfTrue: Float): Stream[Boolean] = {
-    val r = new Random()
-    def getWeightedBool(oddsOfTrue: Float): Boolean = {
-      val randomInt = (r.nextInt(100)) / 100f
-      randomInt < oddsOfTrue
-    }
-
-    Stream.continually(getWeightedBool(oddsOfTrue))
-  }
 
   type Board = Seq[Seq[Content.Value]]
 
@@ -30,7 +20,8 @@ object Board {
 
   def createRandomBoard(width: Int, height: Int, hasCanProb: Float)
   : Seq[Seq[Content.Value]] = {
-    val probs = Seq.fill(height)(createRandomBool(hasCanProb))
+    var randomizer = new ScalaRandomizer()
+    val probs = Seq.fill(height)(randomizer.createRandomBool(hasCanProb))
     createBoard(probs, width)
   }
 }

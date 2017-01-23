@@ -2,6 +2,8 @@ package com.hombredequeso.robbierobot
 
 import com.hombredequeso.robbierobot.Board.Board
 import com.hombredequeso.robbierobot.Strategy._
+import com.hombredequeso.util.RND.ScalaRandomizer
+import com.hombredequeso.util.RandomProvider
 
 object Play {
 
@@ -12,7 +14,6 @@ object Play {
 
   import RelativePosition._
   import Action._
-  import scala.util.Random
 
   case class Coord(val x: Int, val y: Int){
     def + (c: Coord): Coord = {
@@ -23,10 +24,10 @@ object Play {
 
   val initialRobotPosition = Coord(4,4)
 
-  case class PlayStrategy(val map: StrategyMap, val random: Random){}
+  case class PlayStrategy(val map: StrategyMap, val random: RandomProvider){}
 
   def execute(state: State, strategy: StrategyMap, turns: Int): Int = {
-    val r = new Random()
+    val r = new ScalaRandomizer()
     val doTurn = executeTurn(PlayStrategy(strategy, r))_
     val endResult = (1 to turns).foldLeft((state, 0))((current,_) => {
       val next = doTurn(current._1)
@@ -91,7 +92,7 @@ object Play {
     content == Content.Wall
   }
 
-  def getRandomMove(r: Random) = {
+  def getRandomMove(r: RandomProvider) = {
     val x = r.nextInt(4)
     x match {
       case 0 => North
@@ -101,7 +102,7 @@ object Play {
     }
   }
 
-  def executeAction(random: Random)(state: State, action: Action.Value): (State, Int) = {
+  def executeAction(random: RandomProvider)(state: State, action: Action.Value): (State, Int) = {
     action match {
       case MoveNorth =>
         executeMove(state, scenarioOffsets(North))

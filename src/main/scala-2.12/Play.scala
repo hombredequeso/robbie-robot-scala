@@ -26,8 +26,7 @@ object Play {
 
   case class PlayStrategy(val map: StrategyMap, val random: RandomProvider){}
 
-  def execute(state: State, strategy: StrategyMap, turns: Int): Int = {
-    val r = new ScalaRandomizer()
+  def execute(r: RandomProvider)(state: State, strategy: StrategyMap, turns: Int): Int = {
     val doTurn = executeTurn(PlayStrategy(strategy, r))_
     val endResult = (1 to turns).foldLeft((state, 0))((current,_) => {
       val next = doTurn(current._1)

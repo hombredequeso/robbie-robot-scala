@@ -8,7 +8,13 @@ trait RandomProvider {
 
 object RND {
   class ScalaRandomizer extends RandomProvider{
-    val random = new scala.util.Random()
+    var random = new scala.util.Random()
+
+    def this(seed: Long) {
+      this()
+      random = new scala.util.Random(seed)
+    }
+
 
     def createRandomBool(oddsOfTrue: Float): Stream[Boolean] = {
       def getWeightedBool(oddsOfTrue: Float): Boolean = {

@@ -3,6 +3,7 @@ package com.hombredequeso.robbierobot.main
 import com.hombredequeso.robbierobot.Ui.{AlgorithmRunner, GamePlay, View, Vm}
 import com.hombredequeso.robbierobot.Play
 import com.hombredequeso.robbierobot.Strategy.StrategyMap
+import com.hombredequeso.util.RND.ScalaRandomizer
 
 import scala.concurrent.{ExecutionContext, Future}
 import scalafx.animation._
@@ -30,7 +31,10 @@ object HelloSBT extends JFXApp {
     true
   }
 
+  val randomizer = new ScalaRandomizer()
+
   GamePlay.InitializeGameState(
+    randomizer)(
     PlayParameters.xSquareCount,
     PlayParameters.ySquareCount,
     Play.initialRobotPosition

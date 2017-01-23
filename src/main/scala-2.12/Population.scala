@@ -26,10 +26,10 @@ object Evolve {
     (result1.strategy, result2.strategy)
   }
 
-  def breed[A,B](breedingMembers: (Map[A,B], Map[A,B]))(implicit ordering:Ordering[A]): Map[A,B] = {
+  def breed[A,B](randomizer: RandomProvider)(breedingMembers: (Map[A,B], Map[A,B]))(implicit ordering:Ordering[A]): Map[A,B] = {
     val x = breedingMembers._1.toVector.sortBy(x => x._1)
     val size = x.length
-    val randomPoint = new ScalaRandomizer().nextInt(size)
+    val randomPoint = randomizer.nextInt(size)
     val part1 = x.slice(0, randomPoint)
     val y = breedingMembers._2.toVector.sortBy(x => x._1)
     val part2 = y.slice(randomPoint, y.length + 1)
@@ -53,8 +53,7 @@ object Evolve {
     }
   }
 
-  def mutate(strategy: StrategyMap): StrategyMap = {
-    val r = new ScalaRandomizer()
+  def mutate(r: RandomProvider)(strategy: StrategyMap): StrategyMap = {
     val ratioToMutate = 0.1
     val countToMutate = (strategy.size.toDouble * ratioToMutate).toInt
     val actualCountToMutate = r.nextInt(countToMutate + 1)
@@ -62,33 +61,34 @@ object Evolve {
     result.toMap
   }
 
-  def evolveNewMember(population: Vector[Member[StrategyMap]]) : StrategyMap = {
-    val breedingMembers = getBreedingMembers(new ScalaRandomizer())(population)
-    val newMember1 = breed(breedingMembers)
-    val newMember2 = mutate(newMember1)
+  def evolveNewMember(randomizer: => RandomProvider)(population: Vector[Member[StrategyMap]]) : StrategyMap = {
+    val breedingMembers = getBreedingMembers(randomizer)(population)
+    val newMember1 = breed(randomizer)(breedingMembers)
+    val newMember2 = mutate(randomizer)(newMember1)
     newMember2
   }
 
   var iteration = 0
 
-  def evolve(population: Vector[Member[StrategyMap]]): Vector[StrategyMap] = {
+  def evolve(randomizer: RandomProvider)(population: Vector[Member[StrategyMap]]): Vector[StrategyMap] = {
     val totalWeight = population.map(x => (x.fitness)).sum
     val minWeight = population.map(x => (x.fitness)).min
     val maxWeight = population.map(x => (x.fitness)).max
     Console.println(s"it = ${iteration}: max = ${maxWeight}; min = ${minWeight}; totalWeight = ${totalWeight}")
     iteration = iteration + 1
 
-    (1 to population.length).par.map(_ => evolveNewMember(population)).toVector
+    (1 to population.length).par.map(_ => evolveNewMember(new ScalaRandomizer(randomizer.nextInt()))(population)).toVector
   }
 
   def generateNextPopulation
+  (randomizer: RandomProvider)
   (getFitness: StrategyMap => Int)
   (population: Vector[StrategyMap])
   : Vector[StrategyMap] = {
     val members: Vector[Member[StrategyMap]] =
       population.map(
         s => Member(s, getFitness(s)))
-    val newPopulation = Evolve.evolve(members)
+    val newPopulation = Evolve.evolve(randomizer)(members)
     newPopulation
   }
 }

@@ -1,8 +1,9 @@
 package com.hombredequeso.robbierobot
 
-import Content._
-import Action._
-import com.hombredequeso.robbierobot.Play.Scores
+import com.hombredequeso.robbierobot.Action._
+import com.hombredequeso.robbierobot.Content._
+import com.hombredequeso.util.RND.ScalaRandomizer
+import com.hombredequeso.util.RandomProvider
 
 import scala.math.pow
 
@@ -34,21 +35,18 @@ object Strategy {
   type StrategyMap = Map[Scenario, Action]
 
   def getStrategyFitness
+  (randomizer: RandomProvider)
   (boardCount: Int, numberOfTurnsPerBoard: Int)
   (strategy: StrategyMap)
   : Int = {
-    val boards = (1 to boardCount).par.map(x => Board.createRandomBoard(10, 10, 0.5f))
+    val boards = (1 to boardCount).par.map(x => Board.createRandomBoard(new ScalaRandomizer(randomizer.nextInt()))(10, 10, 0.5f))
+    val r = new ScalaRandomizer()
     val fitness = boards.map(b =>
-      Play.execute(
+      Play.execute(randomizer)(
         Play.State(b, Play.initialRobotPosition),
         strategy,
         numberOfTurnsPerBoard))
 
-    /*
-    val maxLikelyTotalPerGame = numberOfTurnsPerBoard * Scores.PickedUpCan / 2
-    val f = 100.0 * fitness.sum / boardCount / maxLikelyTotalPerGame
-    f.toInt
-    */
     fitness.sum
   }
 }

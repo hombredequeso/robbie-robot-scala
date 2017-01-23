@@ -15,7 +15,7 @@ class PlaySpec extends FunSpec {
         val strategy = StrategyFactory.make(
           StrategyFactory.allScenarios,
           StrategyFactory.createRandomActions())
-        val board = Board.createRandomBoard(10, 10, 0.5f)
+        val board = Board.createRandomBoard(new ScalaRandomizer())(10, 10, 0.5f)
         val state = State(board, Play.initialRobotPosition)
 
         val result = Play.executeTurn(PlayStrategy(strategy, new ScalaRandomizer()))(state)
@@ -32,11 +32,13 @@ class PlaySpec extends FunSpec {
         val strategy = StrategyFactory.make(
           StrategyFactory.allScenarios,
           StrategyFactory.createRandomActions())
-        val board = Board.createRandomBoard(10, 10, 0.5f)
+        val randomizer = new ScalaRandomizer()
+        val board = Board.createRandomBoard(randomizer)(10, 10, 0.5f)
         val state = State(board, Play.initialRobotPosition)
 
         val numberOfTurns = 100
-        val result = Play.execute(state, strategy, numberOfTurns)
+        val r = new ScalaRandomizer()
+        val result = Play.execute(r)(state, strategy, numberOfTurns)
 
         val worstPossibleScore =  numberOfTurns * Play.Scores.HitWall
         assert(result >= worstPossibleScore)

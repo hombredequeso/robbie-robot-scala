@@ -2,6 +2,7 @@ package com.hombredequeso.robbierobot
 
 
 import com.hombredequeso.robbierobot.Evolve.Member
+import com.hombredequeso.util.RND.ScalaRandomizer
 import org.scalatest.{FunSpec, Matchers}
 
 class PopulationSpec extends FunSpec with Matchers {
@@ -12,7 +13,7 @@ class PopulationSpec extends FunSpec with Matchers {
         StrategyFactory.createRandomActions())
       var member = Member(strategies, 1)
       var members = Vector(member)
-      val result = Evolve.evolve(members)
+      val result = Evolve.evolve(new ScalaRandomizer())(members)
       result.length shouldBe 1
     }
   }
@@ -25,7 +26,7 @@ class PopulationSpec extends FunSpec with Matchers {
           StrategyFactory.allScenarios,
           StrategyFactory.createRandomActions())
       ).map(x => Member(x, 1))
-      val result = Evolve.evolveNewMember(members.toVector)
+      val result = Evolve.evolveNewMember(new ScalaRandomizer())(members.toVector)
 
       result.size shouldBe StrategyFactory.allScenarios.size
     }

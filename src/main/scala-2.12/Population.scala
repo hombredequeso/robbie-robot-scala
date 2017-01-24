@@ -13,7 +13,7 @@ object Evolve {
 
   def getBreedingMember[A](r: RandomProvider)(membersToRandomlyPick: Int)(population: Vector[Member[A]]): Member[A] = {
     val populationSize = population.length
-    Seq.fill(membersToRandomlyPick)(population(r.nextInt(populationSize)))
+    Seq.fill(membersToRandomlyPick)(population(r.nextInt(populationSize)._1))
       .maxBy(x => x.fitness)
   }
 
@@ -28,7 +28,7 @@ object Evolve {
   def breed[A,B](randomizer: RandomProvider)(breedingMembers: (Map[A,B], Map[A,B]))(implicit ordering:Ordering[A]): Map[A,B] = {
     val x = breedingMembers._1.toVector.sortBy(x => x._1)
     val size = x.length
-    val randomPoint = randomizer.nextInt(size)
+    val randomPoint = randomizer.nextInt(size)._1
     val part1 = x.slice(0, randomPoint)
     val y = breedingMembers._2.toVector.sortBy(x => x._1)
     val part2 = y.slice(randomPoint, y.length + 1)
@@ -43,9 +43,9 @@ object Evolve {
     mutateCount match {
       case x if x <= 0 => strategy
       case _ => {
-        val itemPosToMutate = r.nextInt(strategy.size)
+        val itemPosToMutate = r.nextInt(strategy.size)._1
         val itemToMutate = strategy(itemPosToMutate)
-        val randomAction = Action(r.nextInt(Action.maxId))
+        val randomAction = Action(r.nextInt(Action.maxId)._1)
         val newOne = strategy.patch(itemPosToMutate, Vector((itemToMutate._1, randomAction)), 1)
         mutateR(r)(newOne, mutateCount - 1)
       }
@@ -55,7 +55,7 @@ object Evolve {
   def mutate(r: RandomProvider)(strategy: StrategyMap): StrategyMap = {
     val ratioToMutate = 0.1
     val countToMutate = (strategy.size.toDouble * ratioToMutate).toInt
-    val actualCountToMutate = r.nextInt(countToMutate + 1)
+    val actualCountToMutate = r.nextInt(countToMutate + 1)._1
     val result = mutateR(r)(strategy.toVector, actualCountToMutate)
     result.toMap
   }
@@ -73,7 +73,7 @@ object Evolve {
   : Vector[StrategyMap] = {
     (1 to population.length)
       .par
-      .map(_ => evolveNewMember(new ScalaRandomizer(randomizer.nextInt()))(population))
+      .map(_ => evolveNewMember(new ScalaRandomizer(randomizer.nextInt()._1))(population))
       .toVector
   }
 

@@ -18,7 +18,12 @@ class GeneticAlgorithmSpec extends FunSpec with Matchers {
       val initialPopulation = StrategyFactory.createInitialPopulation(randomizer)(populationSize)
       val getFitness = Strategy.getStrategyFitness(randomizer)(boardCount, numberOfTurnsPerBoard)_
       val result = Optimizer.findOptimalStrategyAndFitness(
-        Evolve.generateNextPopulation(new ScalaRandomizer())(StatWriter.write))(getFitness)(iterationCount)(initialPopulation)
+        Evolve.generateNextPopulation(
+          new ScalaRandomizer())(
+          StatWriter.write))(
+        a => getFitness(a)._1)(
+        iterationCount)(
+        initialPopulation)
 
       Console.println(s"Final fitness: ${result._2}")
       result._2 should be >0

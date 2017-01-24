@@ -3,7 +3,7 @@ package com.hombredequeso.robbierobot
 import com.hombredequeso.robbierobot.Action._
 import com.hombredequeso.robbierobot.Content._
 import com.hombredequeso.util.RND.ScalaRandomizer
-import com.hombredequeso.util.RandomProvider
+import com.hombredequeso.util.{RND, RandomProvider}
 
 import scala.math.pow
 
@@ -34,20 +34,24 @@ object Strategy {
 
   type StrategyMap = Map[Scenario, Action]
 
+  // gets the fitness of a strategy, taking a RandomProvider (stateful),
+  //  and returns the new stateful RandomProvider
   def getStrategyFitness
   (randomizer: RandomProvider)
   (boardCount: Int, numberOfTurnsPerBoard: Int)
   (strategy: StrategyMap)
-  : Int = {
-    val boards = (1 to boardCount).par.map(x => Board.createRandomBoard(new ScalaRandomizer(randomizer.nextInt()))(10, 10, 0.5f))
+  : (Int, RandomProvider) = {
+    val (randomSeeds, newRandomizer) = RND.nextInts(boardCount)(randomizer)
+    val boards = randomSeeds
+      .par
+      .map(x => Board.createRandomBoard(new ScalaRandomizer(x))(10, 10, 0.5f))
     val r = new ScalaRandomizer()
     val fitness = boards.map(b =>
       Play.execute(randomizer)(
         Play.State(b, Play.initialRobotPosition),
         strategy,
         numberOfTurnsPerBoard))
-
-    fitness.sum
+    (fitness.sum, newRandomizer)
   }
 }
 

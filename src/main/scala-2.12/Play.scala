@@ -91,7 +91,7 @@ object Play {
   }
 
   def getRandomMove(r: RandomProvider) = {
-    val x = r.nextInt(4)
+    val x = r.nextInt(4)._1
     x match {
       case 0 => North
       case 1 => South

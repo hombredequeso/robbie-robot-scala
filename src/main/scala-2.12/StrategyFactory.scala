@@ -6,8 +6,11 @@ import com.hombredequeso.util.RandomProvider
 
 object StrategyFactory {
 
-  def createRandomActions(randomizer: RandomProvider) = {
-    Stream.continually(Action(randomizer.nextInt(Action.maxId)))
+  // Recursively construct stream, only taking on demand.
+  // Each time a value is taken, pass the new randomizer state into the next recursive call.
+  def createRandomActions(randomizer: RandomProvider): Stream[Action.Value] = {
+    val next = randomizer.nextInt(Action.maxId)
+    Action(next._1) #:: createRandomActions(next._2)
   }
 
   val allScenarios =

@@ -1,6 +1,5 @@
 package com.hombredequeso.robbierobot
 
-import com.hombredequeso.util.RND.ScalaRandomizer
 import com.hombredequeso.util.RandomProvider
 
 object Board {

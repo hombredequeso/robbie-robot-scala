@@ -1,11 +1,8 @@
 package com.hombredequeso.robbierobot
 
-
 import com.hombredequeso.robbierobot.Play.{PlayStrategy, State}
 import com.hombredequeso.util.RND.ScalaRandomizer
 import org.scalatest.FunSpec
-
-
 
 class PlaySpec extends FunSpec {
 

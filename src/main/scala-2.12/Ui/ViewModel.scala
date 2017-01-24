@@ -46,7 +46,6 @@ object Vm {
   }
 
   private def updateRobotViewModel(robotPos: Play.Coord, viewModel: RobotViewModel): Unit = {
-    Console.println(s"Robot at: ${robotPos.x}, ${robotPos.y}")
     viewModel.xPos.value = (robotPos.x * 100) + 50
     viewModel.yPos.value = (robotPos.y * 100) + 50
   }

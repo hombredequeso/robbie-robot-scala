@@ -2,21 +2,23 @@ package com.hombredequeso.robbierobot.Ui
 
 import com.hombredequeso.geneticAlgorithm.Optimizer
 import com.hombredequeso.robbierobot.Strategy.StrategyMap
-import com.hombredequeso.robbierobot.{Evolve, Strategy, StrategyFactory}
+import com.hombredequeso.robbierobot.{Evolve, StatWriter, Strategy, StrategyFactory}
 import com.hombredequeso.util.RND.ScalaRandomizer
 
 object AlgorithmRunner {
-  val iterationCount = 5
+  val iterationCount = 200
   val populationSize = 200
   val boardCount = 100
   val numberOfTurnsPerBoard = 200
+
+  var iteration = 0
 
   def execute(): (StrategyMap,Int) ={
     val initialPopulation = StrategyFactory.createInitialPopulation(populationSize)
     val randomizer = new ScalaRandomizer()
     val getFitness = Strategy.getStrategyFitness(randomizer)(boardCount, numberOfTurnsPerBoard)_
     val result = Optimizer.findOptimalStrategyAndFitness(
-      Evolve.generateNextPopulation(randomizer))(getFitness)(iterationCount)(initialPopulation)
+      Evolve.generateNextPopulation(randomizer)(StatWriter.write))(getFitness)(iterationCount)(initialPopulation)
     result
   }
 }

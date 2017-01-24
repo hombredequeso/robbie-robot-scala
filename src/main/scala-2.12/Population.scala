@@ -5,7 +5,6 @@ import com.hombredequeso.robbierobot.Action.Action
 import com.hombredequeso.util.RND.ScalaRandomizer
 import com.hombredequeso.util.RandomProvider
 
-import scala.util._
 import scala.math._
 
 object Evolve {
@@ -68,42 +67,26 @@ object Evolve {
     newMember2
   }
 
-  var iteration = 0
-
   def evolve
   (randomizer: RandomProvider)
   (population: Vector[Member[StrategyMap]])
   : Vector[StrategyMap] = {
-    val totalWeight = population.map(x => (x.fitness)).sum
-    val minWeight = population.map(x => (x.fitness)).min
-    val maxWeight = population.map(x => (x.fitness)).max
-    Console.println(s"it = ${iteration}: max = ${maxWeight}; min = ${minWeight}; totalWeight = ${totalWeight}")
-    iteration = iteration + 1
-
     (1 to population.length)
       .par
       .map(_ => evolveNewMember(new ScalaRandomizer(randomizer.nextInt()))(population))
       .toVector
   }
 
-  // {a} Vector[StrategyMap] =>  {b}Vector[(StrategyMap, Int)] => Vector[StrategyMap]
-  // for {a}: need StrategyMap => Int, plus standard compositions.
-  // {b} is in its reduced form.
-  // Need to intercept it and add ability for side effect on it.
-
   def generateNextPopulation
   (randomizer: RandomProvider)
+  (statWriter: Vector[Member[StrategyMap]] => Unit)
   (getFitness: StrategyMap => Int)
-  // for statistical side-effects.
-  // (initialPopulationStatWriter: Vector[Member[StrategyMap]] => Unit
   (population: Vector[StrategyMap])
   : Vector[StrategyMap] = {
     val members: Vector[Member[StrategyMap]] =
       population.map(
         s => Member(s, getFitness(s)))
-
-    // print fitness here.: initialPopulationStatWriter(members)
-
+    statWriter(members)
     val newPopulation = Evolve.evolve(randomizer)(members)
     newPopulation
   }

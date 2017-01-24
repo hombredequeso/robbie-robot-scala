@@ -2,10 +2,10 @@ package com.hombredequeso.robbierobot
 
 import Strategy._
 import com.hombredequeso.robbierobot.Action.Action
+import scala.util.Random.nextInt
 
 object StrategyFactory {
 
-  import util.Random.nextInt
   def createRandomActions() = {
     Stream.continually(Action(nextInt(Action.maxId)))
   }

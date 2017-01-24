@@ -2,7 +2,6 @@ package com.hombredequeso.robbierobot
 
 import com.hombredequeso.robbierobot.Board.Board
 import com.hombredequeso.robbierobot.Strategy._
-import com.hombredequeso.util.RND.ScalaRandomizer
 import com.hombredequeso.util.RandomProvider
 
 object Play {

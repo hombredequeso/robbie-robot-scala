@@ -1,13 +1,13 @@
 package com.hombredequeso.robbierobot
 
 import Strategy._
-import com.hombredequeso.robbierobot.Action.Action
-import scala.util.Random.nextInt
+import Action.Action
+import com.hombredequeso.util.RandomProvider
 
 object StrategyFactory {
 
-  def createRandomActions() = {
-    Stream.continually(Action(nextInt(Action.maxId)))
+  def createRandomActions(randomizer: RandomProvider) = {
+    Stream.continually(Action(randomizer.nextInt(Action.maxId)))
   }
 
   val allScenarios =
@@ -23,11 +23,11 @@ object StrategyFactory {
     scenarios zip actions toMap
   }
 
-  def createInitialPopulation(populationSize: Int): Vector[StrategyMap] = {
+  def createInitialPopulation(randomizer: RandomProvider)(populationSize: Int): Vector[StrategyMap] = {
     (1 to populationSize).map(x =>
       StrategyFactory.make(
         StrategyFactory.allScenarios,
-        StrategyFactory.createRandomActions())
+        StrategyFactory.createRandomActions(randomizer))
     ).toVector
   }
 

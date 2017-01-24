@@ -9,14 +9,13 @@ class PlaySpec extends FunSpec {
   describe("executeTurn") {
     describe("with random input data") {
       it("should return new state and turn score which is higher than lowest possible score") {
+        var randomizer = new ScalaRandomizer()
         val strategy = StrategyFactory.make(
           StrategyFactory.allScenarios,
-          StrategyFactory.createRandomActions())
-        val board = Board.createRandomBoard(new ScalaRandomizer())(10, 10, 0.5f)
+          StrategyFactory.createRandomActions(randomizer))
+        val board = Board.createRandomBoard(randomizer)(10, 10, 0.5f)
         val state = State(board, Play.initialRobotPosition)
-
         val result = Play.executeTurn(PlayStrategy(strategy, new ScalaRandomizer()))(state)
-
         assert(result._2 >= Play.Scores.HitWall)
       }
     }
@@ -26,10 +25,10 @@ class PlaySpec extends FunSpec {
     describe("with random input data") {
       val numberOfTurns = 4
       it(s"should return higher than theoretical minimum score (number of turns = ${numberOfTurns})") {
+        val randomizer = new ScalaRandomizer()
         val strategy = StrategyFactory.make(
           StrategyFactory.allScenarios,
-          StrategyFactory.createRandomActions())
-        val randomizer = new ScalaRandomizer()
+          StrategyFactory.createRandomActions(randomizer))
         val board = Board.createRandomBoard(randomizer)(10, 10, 0.5f)
         val state = State(board, Play.initialRobotPosition)
 

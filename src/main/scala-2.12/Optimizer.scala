@@ -10,19 +10,18 @@ object Optimizer {
     (0 until generationCount).foldLeft(population)((p,_) => generateNextPopulation(p))
   }
 
-  def findOptimalStrategy[A]
+  def findOptimalStrategyAndFitness[A]
   (generateNextPopulation: (A => Int) => Vector[A] => Vector[A])
   (getFitness: A => Int)
   (generationCount: Int)
   (initialPopulation: Vector[A])
-  : A = {
+  : (A,Int) = {
     val getNextPopulation = generateNextPopulation(getFitness)
     val endPopulation = evolveOverGenerations(getNextPopulation)(generationCount)(initialPopulation)
     val finalResultWithFitness = endPopulation.map(a => (a, getFitness(a)))
     val fitness = (x: (A,Int)) => x._2
-    val bestStrategy = finalResultWithFitness.sortBy(fitness).last
-    Console.println(s"Final fitness: ${bestStrategy._2}")
-    bestStrategy._1
+    val bestStrategy: (A, Int) = finalResultWithFitness.sortBy(fitness).last
+    bestStrategy
   }
 }
 

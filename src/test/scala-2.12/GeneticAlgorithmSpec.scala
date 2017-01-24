@@ -13,12 +13,15 @@ class GeneticAlgorithmSpec extends FunSpec with Matchers {
     val boardCount = 100
     val numberOfTurnsPerBoard = 200
 
-    it(s"can execute ${iterationCount} generations") {
+    it(s"can get fitness over 0 with ${iterationCount} generations") {
       val initialPopulation = StrategyFactory.createInitialPopulation(populationSize)
       val randomizer = new ScalaRandomizer()
       val getFitness = Strategy.getStrategyFitness(randomizer)(boardCount, numberOfTurnsPerBoard)_
-      Optimizer.findOptimalStrategy(
+      val result = Optimizer.findOptimalStrategyAndFitness(
         Evolve.generateNextPopulation(new ScalaRandomizer()))(getFitness)(iterationCount)(initialPopulation)
+
+      Console.println(s"Final fitness: ${result._2}")
+      result._2 should be >0
     }
   }
 }

@@ -11,11 +11,11 @@ object AlgorithmRunner {
   val boardCount = 100
   val numberOfTurnsPerBoard = 200
 
-  def execute(): StrategyMap ={
+  def execute(): (StrategyMap,Int) ={
     val initialPopulation = StrategyFactory.createInitialPopulation(populationSize)
     val randomizer = new ScalaRandomizer()
     val getFitness = Strategy.getStrategyFitness(randomizer)(boardCount, numberOfTurnsPerBoard)_
-    val result: StrategyMap = Optimizer.findOptimalStrategy(
+    val result = Optimizer.findOptimalStrategyAndFitness(
       Evolve.generateNextPopulation(randomizer))(getFitness)(iterationCount)(initialPopulation)
     result
   }

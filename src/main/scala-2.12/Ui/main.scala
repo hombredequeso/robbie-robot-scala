@@ -27,7 +27,8 @@ object HelloSBT extends JFXApp {
   var strategy: Option[StrategyMap] = None
   var gotStrategy = Future[Boolean] {
     val bestStrategy = AlgorithmRunner.execute()
-    strategy = Some(bestStrategy)
+    Console.println(s"Final fitness: ${bestStrategy._2}")
+    strategy = Some(bestStrategy._1)
     true
   }
 

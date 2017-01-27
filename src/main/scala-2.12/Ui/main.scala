@@ -18,7 +18,7 @@ object PlayParameters {
 
 object HelloSBT extends JFXApp {
   var lastTime: Long = 0
-  val rate: Long = 100000000
+  val rate: Long = 300000000
 
   val xWindowWidth = 1000
   val yWindowHeight = 1000

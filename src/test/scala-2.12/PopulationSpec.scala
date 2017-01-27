@@ -28,7 +28,7 @@ class PopulationSpec extends FunSpec with Matchers {
           StrategyFactory.allScenarios,
           StrategyFactory.createRandomActions(randomizer))
       ).map(x => Member(x, 1))
-      val result = Evolve.evolveNewMember(randomizer)(members.toVector)
+      val (result, nextRandomizer) = Evolve.evolveNewMemberMFor2(members.toVector).run(randomizer)
       result.size shouldBe StrategyFactory.allScenarios.size
     }
   }

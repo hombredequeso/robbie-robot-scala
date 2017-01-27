@@ -10,13 +10,14 @@ import scalafx.animation._
 import scalafx.application.JFXApp
 import scalafx.application.JFXApp.PrimaryStage
 import scalafx.scene.Scene
+import scalafx.Includes._
 
 object PlayParameters {
   val xSquareCount = 10
   val ySquareCount = 10
 }
 
-object HelloSBT extends JFXApp {
+object AppMain extends JFXApp {
   var lastTime: Long = 0
   val rate: Long = 300000000
 
@@ -33,18 +34,24 @@ object HelloSBT extends JFXApp {
   }
 
   val randomizer = new ScalaRandomizer()
+  def initializeGame() = {
+    GamePlay.InitializeGameState(
+      randomizer)(
+      PlayParameters.xSquareCount,
+      PlayParameters.ySquareCount,
+      Play.initialRobotPosition
+    )
+  }
 
-  GamePlay.InitializeGameState(
-    randomizer)(
-    PlayParameters.xSquareCount,
-    PlayParameters.ySquareCount,
-    Play.initialRobotPosition
-  )
+  initializeGame()
 
   stage = new PrimaryStage {
     title = "Robbie the Rubbish Robot"
     scene = new Scene(xWindowWidth,yWindowHeight) {
       content = View.getContent(Vm.viewModel, xWindowWidth,yWindowHeight)
+      onMouseClicked = handle {
+        initializeGame()
+      }
 
       val timer = AnimationTimer((t:Long) => {
         if (((t - lastTime) > rate)&& strategy.isDefined) {
@@ -57,4 +64,3 @@ object HelloSBT extends JFXApp {
     }
   }
 }
-

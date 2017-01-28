@@ -3,7 +3,7 @@ package com.hombredequeso.robbierobot
 import Strategy._
 import com.hombredequeso.robbierobot.Action.Action
 import com.hombredequeso.util.RND.ScalaRandomizer
-import com.hombredequeso.util.{RND, RandomProvider, State}
+import com.hombredequeso.util.{RND, RandomProvider, RndState, State}
 
 import scala.math._
 
@@ -48,8 +48,7 @@ object Evolve {
     val x = breedingMembers._1.toVector.sortBy(x => x._1)
     val size = x.length
     for {
-      s <- State.get
-      randomPoint <- s.nextInt(size)
+      randomPoint <- RndState.nextInt(size)
       part1 = x.slice(0, randomPoint)
       y = breedingMembers._2.toVector.sortBy(x => x._1)
       part2 = y.slice(randomPoint, y.length + 1)
@@ -101,17 +100,15 @@ object Evolve {
     } yield mutatedChild
 
   def evolve
-  (randomizer: RandomProvider)
   (population: Vector[Member[StrategyMap]])
-  : Vector[StrategyMap] = {
-    val result = (1 to population.length)
+  : State[RandomProvider, Vector[StrategyMap]] = for {
+    parallelRandomizers <- State[RandomProvider, List[Int]] (
+      RND.nextN(population.length)(p => p.nextInt()))
+    result = parallelRandomizers
       .par
-      .map(_ => evolveNewMember(population).run(new ScalaRandomizer(randomizer.nextInt()._1)))
+      .map(x => evolveNewMember(population).run(new ScalaRandomizer(x))._1)
       .toVector
-
-    // For the moment throw away state:
-    result.map(r => r._1)
-  }
+  } yield result
 
   def generateNextPopulation
   (randomizer: RandomProvider)
@@ -123,7 +120,7 @@ object Evolve {
       population.map(
         s => Member(s, getFitness(s)))
     statWriter(members)
-    val newPopulation = Evolve.evolve(randomizer)(members)
+    val (newPopulation, nextRandomizer) = Evolve.evolve(members).run(randomizer)
     newPopulation
   }
 }

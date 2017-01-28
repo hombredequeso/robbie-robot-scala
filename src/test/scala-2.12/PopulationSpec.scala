@@ -14,7 +14,7 @@ class PopulationSpec extends FunSpec with Matchers {
         StrategyFactory.createRandomActions(randomizer))
       var member = Member(strategies, 1)
       var members = Vector(member)
-      val result = Evolve.evolve(randomizer)(members)
+      val (result,_) = Evolve.evolve(members).run(randomizer)
       result.length shouldBe 1
     }
   }

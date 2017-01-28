@@ -48,3 +48,8 @@ object RND {
     }
   }
 }
+
+object RndState {
+  def nextInt(size: Int)= State[RandomProvider, Int](_.nextInt(size))
+  def nextInt = State[RandomProvider, Int](_.nextInt())
+}

@@ -11,8 +11,6 @@ object AlgorithmRunner {
   val boardCount = 100
   val numberOfTurnsPerBoard = 200
 
-  var iteration = 0
-
   def execute(): (StrategyMap,Int) ={
     val randomizer = new ScalaRandomizer()
     val initialPopulation = StrategyFactory.createInitialPopulation(randomizer)(populationSize)

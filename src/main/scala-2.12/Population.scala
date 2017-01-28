@@ -9,7 +9,7 @@ import scala.math._
 
 object Evolve {
 
-  case class Member[A](val strategy: A, val fitness: Int){}
+  case class Member[A](val strategy: A, val fitness: Int) {}
 
   def getBreedingMemberB[A]
   (membersToRandomlyPick: Int)
@@ -38,63 +38,67 @@ object Evolve {
       result1 <- getBreedingMemberM(membersToRandomlyPick)(population)
       result2 <- getBreedingMemberM(membersToRandomlyPick)(population)
     }
-      yield(result1.strategy, result2.strategy)
+      yield (result1.strategy, result2.strategy)
   }
 
-  def breed[A,B]
-  (breedingMembers: (Map[A,B], Map[A,B]))
-  (randomizer: RandomProvider)
-  (implicit ordering:Ordering[A])
-  : (Map[A,B], RandomProvider) = {
+  def breed[A, B]
+  (breedingMembers: (Map[A, B], Map[A, B]))
+  (implicit ordering: Ordering[A]):
+    State[RandomProvider, Map[A, B]] = {
     val x = breedingMembers._1.toVector.sortBy(x => x._1)
     val size = x.length
-    val randomPoint = randomizer.nextInt(size)._1
-    val part1 = x.slice(0, randomPoint)
-    val y = breedingMembers._2.toVector.sortBy(x => x._1)
-    val part2 = y.slice(randomPoint, y.length + 1)
-    val result = part1 ++: part2
-    val r2 = result.toMap
-    (r2, randomizer)
+    for {
+      s <- State.get
+      randomPoint <- s.nextInt(size)
+      part1 = x.slice(0, randomPoint)
+      y = breedingMembers._2.toVector.sortBy(x => x._1)
+      part2 = y.slice(randomPoint, y.length + 1)
+      result = part1 ++: part2
+      r2 = result.toMap
+    } yield r2
   }
+
 
   type VectorizedStrategy = Vector[(Scenario, Action)]
 
-  def mutateR
-  (r: RandomProvider)
-  (strategy: VectorizedStrategy, mutateCount: Int)
-  : VectorizedStrategy = {
-    mutateCount match {
-      case x if x <= 0 => strategy
-      case _ => {
-        val itemPosToMutate = r.nextInt(strategy.size)._1
-        val itemToMutate = strategy(itemPosToMutate)
-        val randomAction = Action(r.nextInt(Action.maxId)._1)
-        val newOne = strategy.patch(itemPosToMutate, Vector((itemToMutate._1, randomAction)), 1)
-        mutateR(r)(newOne, mutateCount - 1)
-      }
-    }
-  }
+  def mutateIt(itemPosToMutate: Int) =
+    State[(RandomProvider, VectorizedStrategy), Unit](s => {
+      val (randomizer, strategy) = s
+      val (randomActionIndex, nextRandomizer) = randomizer.nextInt(Action.maxId)
+      val itemToMutate = strategy(itemPosToMutate)
+      val randomAction = Action(randomActionIndex)
+      val result = strategy.patch(itemPosToMutate, Vector((itemToMutate._1, randomAction)), 1)
+      (Unit, (nextRandomizer, result))
+    })
 
   def mutate
   (strategy: StrategyMap)
-  (r: RandomProvider)
-  : (StrategyMap, RandomProvider) = {
+  = State[RandomProvider, StrategyMap](r => {
     val ratioToMutate = 0.15
+    val strategySize = strategy.size
     val countToMutate = Math.ceil(strategy.size.toDouble * ratioToMutate).toInt
-    val actualCountToMutate = r.nextInt(countToMutate + 1)._1
-    val result = mutateR(r)(strategy.toVector, actualCountToMutate)
-    (result.toMap, r)
-  }
+    val (actualCountToMutate, randomProvider2) = r.nextInt(countToMutate + 1)
+    val (indexesToMutate, randomProvider3) =
+      RND.nextN(actualCountToMutate)(r => r.nextInt(strategySize))(randomProvider2)
+    val funcsToMutate = indexesToMutate.map(i => mutateIt(i))
+
+    val result: State[(RandomProvider, VectorizedStrategy), None.type] = for {
+      _ <- State.sequence(funcsToMutate)
+      s <- State.get
+    } yield None
+    val startState = (randomProvider3, strategy.toVector)
+    val (_, (rn, vs)) = result.run(startState)
+    (vs.toMap, rn)
+  })
 
   def evolveNewMember
   (population: Vector[Member[StrategyMap]])
-  : State[RandomProvider, StrategyMap] = {
+  : State[RandomProvider, StrategyMap] =
     for {
-      gbm <- getBreedingMembers(population)
-      b1 <- State(breed(gbm))
-      m <- State(mutate(b1))
-    } yield m
-  }
+      parents <- getBreedingMembers(population)
+      child <- breed(parents)
+      mutatedChild <- mutate(child)
+    } yield mutatedChild
 
   def evolve
   (randomizer: RandomProvider)

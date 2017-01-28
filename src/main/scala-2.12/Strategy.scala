@@ -41,7 +41,7 @@ object Strategy {
   (boardCount: Int, numberOfTurnsPerBoard: Int)
   (strategy: StrategyMap)
   : (Int, RandomProvider) = {
-    val (randomSeeds, newRandomizer) = RND.nextInts(boardCount)(randomizer)
+    val (randomSeeds, newRandomizer) = RND.nextN(boardCount)(r => r.nextInt)(randomizer)
     val boards = randomSeeds
       .par
       .map(x => Board.createRandomBoard(new ScalaRandomizer(x))(10, 10, 0.5f))

@@ -8,17 +8,20 @@ trait RandomProvider {
 
 object RND {
 
-  // tail-recursively get a List[Int] from a RandomProvider
-  // largely copied from Chiusano
-  def nextInts(count: Int)(rng: RandomProvider): (List[Int], RandomProvider) = {
-    def go(count: Int, r: RandomProvider, xs: List[Int]): (List[Int], RandomProvider) =
+  def nextN[A]
+  (count: Int)
+  (getNext: RandomProvider => (A, RandomProvider))
+  (rng: RandomProvider)
+  : (List[A], RandomProvider) = {
+    def go(count: Int, r: RandomProvider, xs: List[A]): (List[A], RandomProvider) =
       if (count == 0)
         (xs, r)
       else {
-        val (x, r2) = r.nextInt
+        val (x, r2) = getNext(r)
         go(count - 1, r2, x :: xs)
       }
-    go(count, rng, List())
+    val result = go(count, rng, List())
+    result
   }
 
   class ScalaRandomizer(val random: scala.util.Random) extends RandomProvider{

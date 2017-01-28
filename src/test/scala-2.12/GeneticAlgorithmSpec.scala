@@ -8,10 +8,10 @@ class GeneticAlgorithmSpec extends FunSpec with Matchers {
 
   describe("findOptimalStrategy") {
 
-    val iterationCount = 10
-    val populationSize = 200
-    val boardCount = 100
-    val numberOfTurnsPerBoard = 200
+    val iterationCount = 2
+    val populationSize = 100
+    val boardCount = 20
+    val numberOfTurnsPerBoard = 100
 
     it(s"can get fitness over 0 with ${iterationCount} generations") {
       val randomizer = new ScalaRandomizer()

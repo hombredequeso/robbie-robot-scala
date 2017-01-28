@@ -3,7 +3,7 @@ package com.hombredequeso.robbierobot
 import Strategy._
 import com.hombredequeso.robbierobot.Action.Action
 import com.hombredequeso.util.RND.ScalaRandomizer
-import com.hombredequeso.util.{RandomProvider, State}
+import com.hombredequeso.util.{RND, RandomProvider, State}
 
 import scala.math._
 
@@ -11,18 +11,34 @@ object Evolve {
 
   case class Member[A](val strategy: A, val fitness: Int){}
 
-  def getBreedingMember[A](r: RandomProvider)(membersToRandomlyPick: Int)(population: Vector[Member[A]]): Member[A] = {
+  def getBreedingMemberB[A]
+  (membersToRandomlyPick: Int)
+  (population: Vector[Member[A]])
+  (r: RandomProvider)
+  : (Member[A], RandomProvider) = {
     val populationSize = population.length
-    Seq.fill(membersToRandomlyPick)(population(r.nextInt(populationSize)._1))
-      .maxBy(x => x.fitness)
+    val (randomIndices, nextRandomProvider) =
+      RND.nextN(membersToRandomlyPick)(r => r.nextInt(populationSize))(r)
+    (randomIndices.map(i => population(i)).maxBy(x => x.fitness), nextRandomProvider)
   }
 
-  def getBreedingMembers[A](population: Vector[Member[A]])(r: RandomProvider): ((A, A), RandomProvider) = {
+  def getBreedingMemberM[A]
+  (membersToRandomlyPick: Int)
+  (population: Vector[Member[A]])
+  : State[RandomProvider, Member[A]] = {
+    State(getBreedingMemberB(membersToRandomlyPick)(population))
+  }
+
+  def getBreedingMembers[A]
+  (population: Vector[Member[A]])
+  : State[RandomProvider, (A, A)] = {
     val ratioOfMembersToRandomlyPick = 0.15
-    val membersToRandomlyPick = Math.ceil(population.length * ratioOfMembersToRandomlyPick).toInt;
-    val result1 = getBreedingMember(r)(membersToRandomlyPick)(population)
-    val result2 = getBreedingMember(r)(membersToRandomlyPick)(population)
-    ((result1.strategy, result2.strategy), r)
+    val membersToRandomlyPick = Math.ceil(population.length * ratioOfMembersToRandomlyPick).toInt
+    for {
+      result1 <- getBreedingMemberM(membersToRandomlyPick)(population)
+      result2 <- getBreedingMemberM(membersToRandomlyPick)(population)
+    }
+      yield(result1.strategy, result2.strategy)
   }
 
   def breed[A,B]
@@ -43,7 +59,10 @@ object Evolve {
 
   type VectorizedStrategy = Vector[(Scenario, Action)]
 
-  def mutateR(r: RandomProvider)(strategy: VectorizedStrategy, mutateCount: Int): VectorizedStrategy = {
+  def mutateR
+  (r: RandomProvider)
+  (strategy: VectorizedStrategy, mutateCount: Int)
+  : VectorizedStrategy = {
     mutateCount match {
       case x if x <= 0 => strategy
       case _ => {
@@ -67,54 +86,14 @@ object Evolve {
     (result.toMap, r)
   }
 
-  def evolveNewMember(population: Vector[Member[StrategyMap]])(randomizer: => RandomProvider) : StrategyMap = {
-    val (breedingMembers, randomizer2) = getBreedingMembers(population)(randomizer)
-    val (newMember1, randomizer3) = breed(breedingMembers)(randomizer2)
-    val (newMember2, randomizer4) = mutate(newMember1)(randomizer3)
-    newMember2
-  }
-
-  def evolveNewMemberMFor2
+  def evolveNewMember
   (population: Vector[Member[StrategyMap]])
   : State[RandomProvider, StrategyMap] = {
     for {
-      gbm <- State(getBreedingMembers(population))
+      gbm <- getBreedingMembers(population)
       b1 <- State(breed(gbm))
       m <- State(mutate(b1))
     } yield m
-  }
-
-  def evolveNewMemberMFor1
-  (population: Vector[Member[StrategyMap]])
-  (randomizer: => RandomProvider)
-  : (StrategyMap, RandomProvider) = {
-    def result = for{
-      gbm <- State(getBreedingMembers(population))
-      b1 <- State(breed(gbm))
-      m <- State(mutate(b1))
-    } yield m
-    result.run(randomizer)
-  }
-
-  def evolveNewMemberMFlatMap
-  (population: Vector[Member[StrategyMap]])
-  (randomizer: => RandomProvider)
-  : (StrategyMap, RandomProvider) = {
-    def resultM2 = State(getBreedingMembers(population))
-      .flatMap(gbm => State(breed(gbm)))
-      .flatMap(b1 => State(mutate(b1)))
-
-    resultM2.run(randomizer)
-  }
-
-  def evolveOld
-  (randomizer: RandomProvider)
-  (population: Vector[Member[StrategyMap]])
-  : Vector[StrategyMap] = {
-    (1 to population.length)
-      .par
-      .map(_ => evolveNewMember(population)(new ScalaRandomizer(randomizer.nextInt()._1)))
-      .toVector
   }
 
   def evolve
@@ -123,7 +102,7 @@ object Evolve {
   : Vector[StrategyMap] = {
     val result = (1 to population.length)
       .par
-      .map(_ => evolveNewMemberMFor2(population).run(new ScalaRandomizer(randomizer.nextInt()._1)))
+      .map(_ => evolveNewMember(population).run(new ScalaRandomizer(randomizer.nextInt()._1)))
       .toVector
 
     // For the moment throw away state:

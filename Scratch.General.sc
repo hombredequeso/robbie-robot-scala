@@ -1,3 +1,6 @@
+val a1 = List(1,2,3)
+
+
 (0 to 3).toList
 
 

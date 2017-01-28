@@ -18,9 +18,14 @@ object Board {
     probs.map(r => createRow(width, r))
   }
 
-  def createRandomBoard(randomizer: => RandomProvider)(width: Int, height: Int, hasCanProb: Float)
+  def createRandomBoard(randomizer: => RandomProvider)(xSize: Int, ySize: Int, hasCanProb: Float)
   : Seq[Seq[Content.Value]] = {
-    val probs = Seq.fill(height)(randomizer.createRandomBool(hasCanProb))
-    createBoard(probs, width)
+    val probs = Seq.fill(xSize)(randomizer.createRandomBool(hasCanProb))
+    createBoard(probs, ySize)
+  }
+
+  def createSingleContentBoard(xSize: Int, ySize: Int)(content: Content.Value)
+  : Seq[Seq[Content.Value]] = {
+    Seq.fill(xSize)(Seq.fill(ySize)(content))
   }
 }

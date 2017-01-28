@@ -1,10 +1,11 @@
 package com.hombredequeso.robbierobot
 
-import com.hombredequeso.robbierobot.Play.{PlayStrategy, State}
+import com.hombredequeso.robbierobot.Board.Board
+import com.hombredequeso.robbierobot.Play.{Coord, PlayStrategy, State}
 import com.hombredequeso.util.RND.ScalaRandomizer
-import org.scalatest.FunSpec
+import org.scalatest.{FunSpec, Matchers}
 
-class PlaySpec extends FunSpec {
+class PlaySpec extends FunSpec with Matchers{
 
   describe("executeTurn") {
     describe("with random input data") {
@@ -39,6 +40,25 @@ class PlaySpec extends FunSpec {
         val worstPossibleScore =  numberOfTurns * Play.Scores.HitWall
         assert(result >= worstPossibleScore)
       }
+    }
+  }
+
+  describe("outsideBoardLimit") {
+
+    it("returns false if position is on the board") {
+      val xSize = 10
+      val ySize = 15
+
+      val board = Board.createSingleContentBoard(xSize, ySize)(Content.Empty)
+
+      Play.outsideBoardLimit(board, Coord(0,0)) shouldBe false
+      Play.outsideBoardLimit(board, Coord(1,0)) shouldBe false
+      Play.outsideBoardLimit(board, Coord(0,1)) shouldBe false
+      Play.outsideBoardLimit(board, Coord(xSize-1,0)) shouldBe false
+      Play.outsideBoardLimit(board, Coord(0,ySize -1)) shouldBe false
+
+      Play.outsideBoardLimit(board, Coord(xSize,0)) shouldBe true
+      Play.outsideBoardLimit(board, Coord(0,ySize)) shouldBe true
     }
   }
 }

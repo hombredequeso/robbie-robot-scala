@@ -62,8 +62,8 @@ object Play {
 
   def getContent(board: Board, c: Coord): Content.Value = {
     board
-      .lift(c.x).getOrElse(Vector())
-      .lift(c.y).getOrElse(Content.Wall)
+      .lift(c.x).fold(Seq[Content.Value]())(x=>x)
+      .lift(c.y).fold(Content.Wall)(x=> x)
   }
 
   def getScenario(state: State) : Scenario = {
@@ -82,12 +82,8 @@ object Play {
     val HitWall = -5
   }
 
-
   def outsideBoardLimit(board: Board, newPos: Coord): Boolean = {
-    val content = board
-                    .lift(newPos.x).getOrElse(Vector())
-                    .lift(newPos.y).getOrElse(Content.Wall)
-    content == Content.Wall
+    getContent(board, newPos) == Content.Wall
   }
 
   def getRandomMove(r: RandomProvider) = {

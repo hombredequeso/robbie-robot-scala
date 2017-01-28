@@ -18,7 +18,7 @@ object Evolve {
   }
 
   def getBreedingMembers[A](population: Vector[Member[A]])(r: RandomProvider): ((A, A), RandomProvider) = {
-    val ratioOfMembersToRandomlyPick = 0.2
+    val ratioOfMembersToRandomlyPick = 0.15
     val membersToRandomlyPick = Math.ceil(population.length * ratioOfMembersToRandomlyPick).toInt;
     val result1 = getBreedingMember(r)(membersToRandomlyPick)(population)
     val result2 = getBreedingMember(r)(membersToRandomlyPick)(population)
@@ -60,8 +60,8 @@ object Evolve {
   (strategy: StrategyMap)
   (r: RandomProvider)
   : (StrategyMap, RandomProvider) = {
-    val ratioToMutate = 0.2
-    val countToMutate = (strategy.size.toDouble * ratioToMutate).toInt
+    val ratioToMutate = 0.15
+    val countToMutate = Math.ceil(strategy.size.toDouble * ratioToMutate).toInt
     val actualCountToMutate = r.nextInt(countToMutate + 1)._1
     val result = mutateR(r)(strategy.toVector, actualCountToMutate)
     (result.toMap, r)

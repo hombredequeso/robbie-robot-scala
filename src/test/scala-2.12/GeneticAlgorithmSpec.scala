@@ -1,7 +1,10 @@
 package com.hombredequeso.robbierobot
 
 import com.hombredequeso.geneticAlgorithm.Optimizer
+import com.hombredequeso.robbierobot.Evolve.{GenerationContext, GenerationStatistics, Member}
+import com.hombredequeso.robbierobot.Strategy.StrategyMap
 import com.hombredequeso.util.RND.ScalaRandomizer
+import com.hombredequeso.util.{RandomProvider, State}
 import org.scalatest.{FunSpec, Matchers}
 
 class GeneticAlgorithmSpec extends FunSpec with Matchers {
@@ -17,10 +20,18 @@ class GeneticAlgorithmSpec extends FunSpec with Matchers {
       val randomizer = new ScalaRandomizer()
       val initialPopulation = StrategyFactory.createInitialPopulation(randomizer)(populationSize)
       val getFitness = Strategy.getStrategyFitness(randomizer)(boardCount, numberOfTurnsPerBoard)_
+
+      var stats = new GenerationStatistics(List())
+      var randomizerState: GenerationContext =
+        new GenerationContext(new ScalaRandomizer(), stats)
+
+      def f2(getFitness: StrategyMap => Int)(population: Vector[StrategyMap]) = {
+        val result = Evolve.generateNextPopulation(getFitness)(population).run(randomizerState)
+        result._1
+      }
+
       val result = Optimizer.findOptimalStrategyAndFitness(
-        Evolve.generateNextPopulation(
-          new ScalaRandomizer())(
-          StatWriter.write))(
+        f2)(
         a => getFitness(a)._1)(
         iterationCount)(
         initialPopulation)

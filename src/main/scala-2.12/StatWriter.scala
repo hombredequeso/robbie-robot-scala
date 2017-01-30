@@ -7,11 +7,16 @@ object StatWriter {
 
   var iteration = 0
 
-  def write(population: Vector[Member[StrategyMap]]): Unit = {
+  def getStats(population: Vector[Member[StrategyMap]]): String = {
     val totalWeight = population.map(x => (x.fitness)).sum
     val minWeight = population.map(x => (x.fitness)).min
     val maxWeight = population.map(x => (x.fitness)).max
-    Console.println(s"it = ${iteration}: max = ${maxWeight}; min = ${minWeight}; totalWeight = ${totalWeight}")
+      s"it = ${iteration}: max = ${maxWeight}; min = ${minWeight}; totalWeight = ${totalWeight}"
+  }
+
+  def write(population: Vector[Member[StrategyMap]]): Unit = {
+    val statLine = getStats(population)
+    Console.println(statLine)
     iteration = iteration + 1
   }
 }

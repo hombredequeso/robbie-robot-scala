@@ -38,7 +38,7 @@ object Optimizer {
   : State[S, (A, Int)] = {
     val pAndF: Vector[State[S, (A, Int)]] =
       population.map(p => getFitness(p).map(i => (p,i)))
-    val a = State.sequenceV(pAndF)
+    val a = State.sequence(pAndF)
     val best = a.map(x => x.sortBy(e => e._2).last)
     best
   }

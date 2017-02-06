@@ -39,7 +39,7 @@ object State {
     State((s: S) => go(s,sas,List()))
   }
 
-  def sequenceV[S, A](sas: Vector[State[S, A]]): State[S, Vector[A]] = {
+  def sequence[S, A](sas: Vector[State[S, A]]): State[S, Vector[A]] = {
     def go(s: S, actions: Vector[State[S,A]], acc: Vector[A]): (Vector[A],S) =
       actions match {
         case Vector() => (acc.reverse,s)

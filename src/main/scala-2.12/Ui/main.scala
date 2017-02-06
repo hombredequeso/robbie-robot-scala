@@ -1,5 +1,6 @@
 package com.hombredequeso.robbierobot.main
 
+import com.hombredequeso.robbierobot.Evolve.{GenerationContext, GenerationStatistics}
 import com.hombredequeso.robbierobot.Ui.{AlgorithmRunner, GamePlay, View, Vm}
 import com.hombredequeso.robbierobot.Play
 import com.hombredequeso.robbierobot.Strategy.StrategyMap
@@ -17,6 +18,15 @@ object PlayParameters {
   val ySquareCount = 10
 }
 
+object StatWriter {
+  def DumpToConsole(stats: List[String]): Unit = {
+  Console.println("Start: statWriter.stats =============================================")
+  stats.foreach(Console.println(_))
+  Console.println("End: statWriter.stats =============================================")
+  }
+}
+
+
 object AppMain extends JFXApp {
   var lastTime: Long = 0
   val rate: Long = 300000000
@@ -27,9 +37,16 @@ object AppMain extends JFXApp {
   implicit val ec = ExecutionContext.global
   var strategy: Option[StrategyMap] = None
   var gotStrategy = Future[Boolean] {
-    val bestStrategy = AlgorithmRunner.execute()
+
+    val generationContext = new GenerationContext(
+      new ScalaRandomizer(),
+      new GenerationStatistics(List(), 0))
+
+    val bestStrategyWithState = AlgorithmRunner.execute().run(generationContext)
+    val bestStrategy = bestStrategyWithState._1
     Console.println(s"Final fitness: ${bestStrategy._2}")
     strategy = Some(bestStrategy._1)
+    StatWriter.DumpToConsole(bestStrategyWithState._2.statWriter.getStats())
     true
   }
 

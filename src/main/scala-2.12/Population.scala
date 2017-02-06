@@ -25,6 +25,8 @@ object Evolve {
       this.copy(generation = newGenerationNumber, lines = newStatLine::lines)
     }
 
+    def getStats(): List[String] = lines.reverse
+
     def write(x: Vector[Member[StrategyMap]]): GenerationStatistics = {
       val newStatLine = StatWriter.getStats(x)
       Console.println(newStatLine)

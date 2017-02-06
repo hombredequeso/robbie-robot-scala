@@ -3,11 +3,48 @@ package com.hombredequeso.robbierobot
 import Strategy._
 import com.hombredequeso.robbierobot.Action.Action
 import com.hombredequeso.util.RND.ScalaRandomizer
-import com.hombredequeso.util.{RND, RandomProvider, RndState, State}
+import com.hombredequeso.util.{RND, RandomProvider, State}
 
 import scala.math._
 
 object Evolve {
+
+  object RndState {
+    def nextInt(size: Int)= State[RandomProvider, Int](_.nextInt(size))
+    def nextInt = State[RandomProvider, Int](_.nextInt())
+
+    def nextN[A](count: Int)(getNext: RandomProvider => (A, RandomProvider)) =
+      State[RandomProvider, List[A]](r =>  r.nextN(count)(getNext))
+  }
+
+  case class GenerationStatistics(val lines: List[String], val generation: Int) {
+    def newGeneration(): GenerationStatistics = {
+      val newGenerationNumber = generation + 1
+      val newStatLine = s"Generation ${newGenerationNumber}"
+      Console.println(newStatLine)
+      this.copy(generation = newGenerationNumber, lines = newStatLine::lines)
+    }
+
+    def write(x: Vector[Member[StrategyMap]]): GenerationStatistics = {
+      val newStatLine = StatWriter.getStats(x)
+      Console.println(newStatLine)
+      val newStatLines = newStatLine :: lines
+      this.copy(lines = newStatLines)
+    }
+  }
+
+  object StatisticsState {
+    def write(x: Vector[Member[StrategyMap]])=
+      State[GenerationStatistics, Unit](s => (Unit, s.write(x)))
+    def newGeneration() =
+      State[GenerationStatistics, Unit](s => (Unit, s.newGeneration()))
+  }
+
+  case class GenerationContext
+  (
+    val randomizer: RandomProvider,
+    val statWriter: GenerationStatistics
+  )
 
   case class Member[A](val strategy: A, val fitness: Int) {}
 
@@ -103,23 +140,6 @@ object Evolve {
   } yield result
 
 
-  case class GenerationStatistics(val lines: List[String]) {}
-
-  object GenerationStatistics {
-    def write(x: Vector[Member[StrategyMap]]) =
-      State[GenerationStatistics, Unit](
-        (generationStats: GenerationStatistics) => {
-          StatWriter.write(x)
-          (Unit, generationStats)
-        })
-  }
-
-  case class GenerationContext
-  (
-    val randomizer: RandomProvider,
-    val statWriter: GenerationStatistics
-  )
-
   def generateNextPopulation
   (getFitness: StrategyMap => Int)
   (population: Vector[StrategyMap])
@@ -127,10 +147,15 @@ object Evolve {
     val members: Vector[Member[StrategyMap]] =
       population.map(s => Member(s, getFitness(s)))
 
-    val (_, nextWriter) = GenerationStatistics.write(members).run(context.statWriter)
+    val statResult = for {
+      r1 <- StatisticsState.newGeneration()
+      r2 <- StatisticsState.write(members)
+    } yield r2
+
+    val statFinally = statResult.run(context.statWriter)._2
 
     val (newPopulation, nextRandomizer) = Evolve.evolve(members).run(context.randomizer)
-    (newPopulation, GenerationContext(nextRandomizer, nextWriter))
+    (newPopulation, GenerationContext(nextRandomizer, statFinally))
   })
 }
 

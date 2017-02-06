@@ -55,10 +55,3 @@ object RND {
   }
 }
 
-object RndState {
-  def nextInt(size: Int)= State[RandomProvider, Int](_.nextInt(size))
-  def nextInt = State[RandomProvider, Int](_.nextInt())
-
-  def nextN[A](count: Int)(getNext: RandomProvider => (A, RandomProvider)) =
-    State[RandomProvider, List[A]](r =>  r.nextN(count)(getNext))
-}

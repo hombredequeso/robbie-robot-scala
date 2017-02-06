@@ -5,6 +5,7 @@ import com.hombredequeso.robbierobot.Evolve.{GenerationContext, GenerationStatis
 import com.hombredequeso.robbierobot.Strategy.StrategyMap
 import com.hombredequeso.robbierobot.{Evolve, Strategy, StrategyFactory}
 import com.hombredequeso.util.RND.ScalaRandomizer
+import com.hombredequeso.util.State
 
 object AlgorithmRunner {
   val iterationCount = 200
@@ -18,19 +19,21 @@ object AlgorithmRunner {
     val getFitness =
       (strategy: StrategyMap) =>
         Strategy.getStrategyFitness(randomizer)(boardCount, numberOfTurnsPerBoard)(strategy)._1
+    val getFitness2 = getFitness.andThen(i => State.unit[GenerationContext, Int](i))
 
     // State management:
-    var stats = new GenerationStatistics(List())
-    var randomizerState: GenerationContext =
+    val stats = new GenerationStatistics(List(), 0)
+    val randomizerState: GenerationContext =
       new GenerationContext(new ScalaRandomizer(), stats)
 
-    def f2(getFitness: StrategyMap => Int)(population: Vector[StrategyMap]) = {
-      val result = Evolve.generateNextPopulation(getFitness)(population).run(randomizerState)
-      result._1
-    }
 
-    val result = Optimizer.findOptimalStrategyAndFitness(f2)(getFitness)(iterationCount)(initialPopulation)
-    result
+    val getNextPopulation = Evolve.generateNextPopulation(getFitness)_
+    val resultOfGenerations =
+      Optimizer.executeGenerations(getNextPopulation)(State.unit(initialPopulation))(iterationCount)
+    val (finalPopulation, finalGenerationContext) = resultOfGenerations.run(randomizerState)
+    val bestStrategy: ((StrategyMap, Int), GenerationContext) =
+      Optimizer.getBestStrategy(getFitness2)(finalPopulation).run(finalGenerationContext)
+    bestStrategy._1
   }
 }
 
